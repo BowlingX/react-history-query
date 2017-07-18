@@ -37,10 +37,15 @@ export const formCreator = (name:string) => {
   })(Export);
 
   Export = connect((state) => {
-    const formValues = getFormValues(name)(state);
+    const initialValues = {
+      checked: false,
+      text: ''
+    };
+    const formValues = getFormValues(name)(state) || initialValues;
     return {
-      [`p.checked`]: formValues ? formValues.checked || false : false,
-      [`p.text`]: formValues ? formValues.text || '' : ''
+      initialValues,
+      [`p.checked`]: formValues.checked || false,
+      [`p.text`]: formValues.text
     };
   })(Export);
 
