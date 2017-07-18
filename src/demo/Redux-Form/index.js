@@ -13,7 +13,6 @@ type Props = {
   onChange: () => void,
   handleSubmit: () => void
 };
-// $FlowFixMe: ignore
 const SimpleForm = (props: Props) => {
   const { handleSubmit } = props;
   return (
@@ -26,7 +25,7 @@ const SimpleForm = (props: Props) => {
   );
 };
 
-export const formCreator = (name) => {
+export const formCreator = (name:string) => {
   let Export = connectQueryToProps(name, {
     [`p.checked`]: parameter('checked'),
     [`p.text`]: parameter('text')

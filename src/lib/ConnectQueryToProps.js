@@ -5,7 +5,7 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import shallowEqual from 'fbjs/lib/shallowEqual';
+import shallowEqual from 'shallowequal';
 
 const getOptionsFromProps = (options: Object, props: Object) => {
   return Object.keys(options).reduce(
@@ -23,6 +23,8 @@ const connectQueryToProps = (namespace: string, options: Object) => (InnerCompon
 
     context: Object;
 
+    innerComponentRef: Element;
+
     componentWillMount() {
       const state = this.context.queryManager.register(namespace, options, this.props);
       this.setState(state);
@@ -38,8 +40,8 @@ const connectQueryToProps = (namespace: string, options: Object) => (InnerCompon
       }
       // check if the parameters actually changed:
       if (!shallowEqual(
-        getOptionsFromProps(options, prevState),
-        getOptionsFromProps(options, this.state))
+          getOptionsFromProps(options, prevState),
+          getOptionsFromProps(options, this.state))
       ) {
         this.context.queryManager.pushChanges(namespace, this.state);
       }
@@ -55,8 +57,12 @@ const connectQueryToProps = (namespace: string, options: Object) => (InnerCompon
       }
     }
 
+    getWrappedInstance() {
+      return this.innerComponentRef;
+    }
+
     render() {
-      return <InnerComponent {...this.state} />;
+      return <InnerComponent ref={(instance) => { this.innerComponentRef = instance; }} {...this.state} />;
     }
   };
 };

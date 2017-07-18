@@ -2,9 +2,8 @@
  * @flow
  */
 import React from 'react';
-import Root, { parameter, history } from '../shared/Root';
-import { BrowserRouter, Router, Link } from 'react-router-dom';
-import { Route } from 'react-router';
+import { Router, Link, Route } from 'react-router-dom';
+import Root, { history } from '../shared/Root';
 import { formCreator } from '../Redux-Form/index';
 
 const Form1 = formCreator('form1');
@@ -24,7 +23,7 @@ const SecondRoute = () => {
   return (
     <div>
       <h1>Second-Route</h1>
-      <Link to="/first">Go to first</Link>
+      <Link to="/first?form1.p.checked=true">Go to first</Link>
       <Form2 />
     </div>
   );
@@ -35,7 +34,7 @@ const ReactRouter = () => {
     <Root>
       <Router history={history}>
         <div>
-          <Link to="/first">Go to first</Link>
+          <Link to="/first">Open initial</Link>
           <Route path="/first" component={FirstRoute} />
           <Route path="/second" component={SecondRoute} />
         </div>

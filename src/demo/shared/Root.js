@@ -6,8 +6,8 @@ import React from 'react';
 import { createStore, combineReducers, compose } from 'redux';
 import { reducer as formReducer } from 'redux-form';
 import createHistory from 'history/createBrowserHistory';
-import QueryContainer from '../../lib/components/QueryContainer';
 import { Provider } from 'react-redux';
+import QueryContainer from '../../lib/components/QueryContainer';
 
 export const history = createHistory();
 
@@ -21,19 +21,19 @@ const store = createStore(
   )
 );
 
-export const parameter = name => ({
+export const parameter = (name:string) => ({
   // called during serialization
   toQueryString: (value: any) => {
     return JSON.stringify(value);
   },
   // called initially before render
-  fromQueryString: (value: any, props) => {
+  fromQueryString: (value: any, props:Object) => {
     const nextValue = JSON.parse(value);
     props.change(name, nextValue);
     return nextValue;
   },
   // called if navigate and a certain state should be restored
-  fromHistory: (value: boolean, props) => {
+  fromHistory: (value: boolean, props:Object) => {
     props.change(name, value);
   }
 });

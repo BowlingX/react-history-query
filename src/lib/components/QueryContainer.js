@@ -7,7 +7,7 @@ import queryString from 'query-string';
 import PropTypes from 'prop-types';
 import { createSelector } from 'reselect';
 import createCachedSelector from 're-reselect';
-import shallowEqual from 'fbjs/lib/shallowEqual';
+import shallowEqual from 'shallowequal';
 
 type QueryContainerProps = {
   history: Object,
@@ -19,7 +19,7 @@ export default class QueryContainer extends Component {
 
   components: Object = {};
 
-  initialParsedQuery: () => Object;
+  initialParsedQuery: (location:Object) => Object;
 
   isTransitioning: boolean = false;
 
@@ -27,36 +27,81 @@ export default class QueryContainer extends Component {
 
   constructor(props: QueryContainerProps) {
     super(props);
-    const searchSelector = () => props.history.location.search;
+    const searchSelector = location => location.search;
     this.initialParsedQuery =
     createSelector(searchSelector, search => queryString.parse(search));
   }
 
+  /**
+   * Handles external push events
+   */
+  handlePush(history:Object) {
+    this.isTransitioning = true;
+    const parsedQuery = this.initialParsedQuery(this.props.history.location);
+    Object.keys(this.components).forEach((cmp) => {
+      const { blankState, options, props, state } = this.components[cmp];
+      const serialized = {};
+      const nextState = Object.keys(options).reduce((initial, optionKey) => {
+        const queryValue = parsedQuery[`${cmp}.${optionKey}`];
+        const blankStateValue = blankState[optionKey];
+        let newState = blankStateValue;
+        if (queryValue !== undefined) {
+          newState = options[optionKey].fromQueryString(queryValue, props);
+          serialized[`${cmp}.${optionKey}`] = queryValue;
+        } else if (blankStateValue !== undefined) {
+          const oldValue = state[optionKey];
+          if (!shallowEqual(oldValue, blankStateValue)) {
+            options[optionKey].fromHistory(blankStateValue, props);
+          }
+        }
+        initial[optionKey] = newState;
+        return initial;
+      }, {});
+      this.components[cmp] = { ...this.components[cmp], state: nextState, serialized };
+      // re-save modified history state
+      history.replace(global.location, { __componentState: this.currentComponentState() });
+    });
+    requestAnimationFrame(() => {
+      this.isTransitioning = false;
+    });
+  }
+
+  handlePop(previousState:Object) {
+    this.isTransitioning = true;
+    Object.keys(previousState).forEach((key) => {
+      if (this.components[key]) {
+        Object.keys(previousState[key]).forEach((propKey) => {
+          const oldValue = previousState[key][propKey];
+          if (oldValue === undefined || (!shallowEqual(oldValue, this.components[key].state[propKey]))) {
+            this.components[key].options[propKey].fromHistory(
+              oldValue, this.components[key].props);
+            // mutate current state with old value,
+            // this way we can only call fromHistory where required
+            this.components[key].state[propKey] = oldValue;
+          }
+        });
+      }
+    });
+    this.isTransitioning = false;
+  }
+
   componentDidMount() {
     const { history } = this.props;
-    history.replace(global.location, { componentState: this.currentComponentState(), isInitial: true });
+    // save initial state
+    history.replace(global.location, { __componentState: this.currentComponentState(), isInitial: true });
     this.listener = history.listen((location, action) => {
-      const previousState = location.state && location.state.componentState ?
-        location.state.componentState : this.blankComponentState();
+      const historyState = location.state && location.state.__componentState;
+      // react to external events
+      if (action === 'PUSH' && !historyState) {
+        this.handlePush(history);
+        return;
+      }
+      const previousState = historyState ?
+        location.state.__componentState : this.blankComponentState();
       if (action !== 'POP' || !previousState) {
         return;
       }
-      this.isTransitioning = true;
-      Object.keys(previousState).forEach((key) => {
-        if (this.components[key]) {
-          Object.keys(previousState[key]).forEach((propKey) => {
-            const oldValue = previousState[key][propKey];
-            if (oldValue === undefined || (!shallowEqual(oldValue, this.components[key].state[propKey]))) {
-              this.components[key].options[propKey].fromHistory(
-                oldValue, this.components[key].props);
-              // mutate current state with old value,
-              // this way we can only call fromHistory where required
-              this.components[key].state[propKey] = oldValue;
-            }
-          });
-        }
-      });
-      this.isTransitioning = false;
+      this.handlePop(previousState);
     });
   }
 
@@ -110,7 +155,7 @@ export default class QueryContainer extends Component {
           this.components[namespace] = { ...this.components[namespace], ...next };
           this.props.history.push(
             { pathname: location.pathname, search: this.calculateQueryString() },
-            { componentState: this.currentComponentState() }
+            { __componentState: this.currentComponentState() }
           );
         },
         register: (namespace: string, options: Object, props: Object) => {
@@ -131,7 +176,7 @@ export default class QueryContainer extends Component {
           // serialized query parameter state
           const serialized = {};
           const state = Object.keys(options).reduce((initial, key) => {
-            const initialQueryValue = this.initialParsedQuery()[`${namespace}.${key}`];
+            const initialQueryValue = this.initialParsedQuery(this.props.history.location)[`${namespace}.${key}`];
             if (props[key] !== undefined) {
               blankState[key] = props[key];
               initialState[key] = props[key];
