@@ -1,0 +1,73 @@
+{
+  "name": "react-history-query",
+  "version": "0.0.1",
+  "description": "a higher order component to connect the history with component props",
+  "main": "index.js",
+  "scripts": {
+    "lint": "flow check && eslint src/",
+    "start": "styleguidist server",
+    "styleguide": "styleguidist server",
+    "styleguide:build": "styleguidist build",
+    "test": "karma start --single-run --ci --test",
+    "tdd": "karma start --auto-watch --test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BowlingX/react-history-query.git"
+  },
+  "author": "David Heidrich",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BowlingX/react-workshop/issues"
+  },
+  "homepage": "https://github.com/BowlingX/react-history-query#readme",
+  "dependencies": {
+    "fbjs": "^0.8.12",
+    "history": "^4.6.3",
+    "prop-types": "^15.5.10",
+    "query-string": "^4.3.4",
+    "re-reselect": "^0.5.0",
+    "react": "^15.6.1",
+    "react-addons-shallow-compare": "^15.6.0",
+    "react-dom": "^15.6.1",
+    "reselect": "^3.0.1"
+  },
+  "devDependencies": {
+    "@storybook/addon-info": "^3.1.6",
+    "@storybook/react": "^3.1.7",
+    "babel-eslint": "^7.2.3",
+    "babel-plugin-syntax-async-functions": "^6.13.0",
+    "babel-plugin-syntax-dynamic-import": "^6.18.0",
+    "babel-plugin-transform-flow-strip-types": "^6.22.0",
+    "babel-plugin-transform-proto-to-assign": "^6.23.0",
+    "css-loader": "^0.28.4",
+    "enzyme": "^2.9.1",
+    "eslint": "^3.19.0",
+    "eslint-config-airbnb": "^15.0.2",
+    "eslint-plugin-flowtype": "^2.35.0",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-jsx-a11y": "^5.1.1",
+    "eslint-plugin-react": "^7.1.0",
+    "flow-bin": "^0.49.1",
+    "flow-status-webpack-plugin": "^0.1.7",
+    "jasmine-core": "^2.6.4",
+    "karma": "^1.7.0",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-coverage": "^1.1.1",
+    "karma-jasmine": "^1.1.0",
+    "karma-jasmine-ajax": "^0.1.13",
+    "karma-junit-reporter": "^1.2.0",
+    "karma-spec-reporter": "0.0.31",
+    "karma-webpack": "^2.0.4",
+    "node-sass": "^4.5.3",
+    "react-addons-test-utils": "^15.6.0",
+    "react-redux": "^5.0.5",
+    "react-router": "^4.1.2",
+    "react-router-dom": "^4.1.2",
+    "react-styleguidist": "^5.5.2",
+    "react-test-renderer": "^15.6.1",
+    "redux": "^3.7.1",
+    "redux-form": "^6.8.0",
+    "style-loader": "^0.18.2"
+  }
+}
