@@ -30,5 +30,4 @@ jobs:
 
       # run tests!
       - run: npm test
-      - run: npm build
       - run: npm run semantic-release
