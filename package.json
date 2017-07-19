@@ -25,6 +25,17 @@
     "type": "git",
     "url": "https://github.com/BowlingX/react-history-query.git"
   },
+  "release": {
+    "debug": false,
+    "verifyConditions": {
+      "path": "./node_modules/semantic-release/dist/lib/plugin-noop.js"
+    }
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
   "keywords": [
     "react",
     "url",
