@@ -7,7 +7,7 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: circleci/node:7.10-browsers
+      - image: circleci/node:8.0-browsers
 
     working_directory: ~/repo
 
@@ -30,5 +30,4 @@ jobs:
 
       # run tests!
       - run: npm test
-      - run: npm run build
       - run: npm run semantic-release
