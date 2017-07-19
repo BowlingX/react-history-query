@@ -15,7 +15,6 @@
     "styleguide:build": "styleguidist build",
     "test": "karma start --single-run --ci --test",
     "tdd": "karma start --auto-watch --test",
-    "prepublish": "npm run lint && npm run build",
     "build:es": "cross-env BABEL_ENV=es babel src/lib --out-dir dist/es6",
     "build:commonjs": "cross-env BABEL_ENV=commonjs babel src/lib --out-dir dist/commonjs",
     "clean": "rimraf dist test_out",
