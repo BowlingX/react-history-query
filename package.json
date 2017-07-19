@@ -28,12 +28,7 @@
   "release": {
     "debug": false,
     "verifyConditions": {
-      "path": "./node_modules/semantic-release/dist/lib/plugin-noop.js"
-    }
-  },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
+      "path": "./node_modules/semantic-release/src/lib/plugin-noop.js"
     }
   },
   "keywords": [
