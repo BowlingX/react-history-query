@@ -13,7 +13,7 @@
     "start": "styleguidist server",
     "styleguide": "styleguidist server",
     "styleguide:build": "styleguidist build",
-    "test": "karma start --single-run --ci --test",
+    "test": "cross-env BABEL_ENV=test karma start --single-run --ci --test",
     "tdd": "karma start --auto-watch --test",
     "build:es": "cross-env BABEL_ENV=es babel src/lib --out-dir dist/es6",
     "build:commonjs": "cross-env BABEL_ENV=commonjs babel src/lib --out-dir dist/commonjs",
