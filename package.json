@@ -4,10 +4,6 @@
   "description": "a higher order component to connect the history with component props",
   "main": "dist/commonjs/index.js",
   "module": "dist/es6/index.js",
-  "files": [
-    "dist",
-    "src/lib"
-  ],
   "scripts": {
     "lint": "flow check && eslint src/",
     "start": "styleguidist server",

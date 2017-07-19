@@ -1,2 +1,13 @@
 # Created by .ignore support plugin (hsz.mobi)
-__tests__
+**/__tests__
+.circleci
+.flow
+flow-typed
+.flowconfig
+karma.conf.es6
+karma.conf.js
+styleguide.config.js
+webpack.config.js
+.eslintrc
+*.iml
+.idea
