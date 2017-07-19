@@ -30,4 +30,5 @@ jobs:
 
       # run tests!
       - run: npm test
+      - run: npm prepublishOnly
       - run: npm run semantic-release

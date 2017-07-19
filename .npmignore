@@ -14,3 +14,4 @@ webpack.config.js
 src/demo
 test_out
 reports
+package-lock.json
