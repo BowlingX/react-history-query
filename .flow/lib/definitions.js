@@ -1,9 +1,4 @@
-declare module 'fbjs/lib/shallowEqual' {
-  declare var exports:any;
-}
-
-
-// Jasmine type definitions, TODO: they must be defined somewhere
+// Jasmine type definitions
 declare function describe(...args:any):any;
 declare function it(...args:any):any;
 declare function expect(...args:any):any;

@@ -1,5 +1,33 @@
 {
-  "presets": ["react", "babel-preset-es2015"],
+  "presets": [
+    "react",
+    ["env", {
+      "modules": false
+    }]
+  ],
+  "env": {
+    "commonjs": {
+      "presets": [
+        "react",
+        ["env", {
+          "targets": {
+            "browsers": ["last 2 versions", "safari >= 7"]
+          }
+        }]
+      ],
+      "plugins": [
+        ["transform-es2015-modules-commonjs", { "loose": true }],
+        "syntax-dynamic-import",
+        "syntax-async-functions",
+        "transform-class-properties",
+        "transform-flow-strip-types",
+        "transform-object-rest-spread",
+        "transform-regenerator",
+        "transform-runtime",
+        "transform-proto-to-assign"
+      ]
+    }
+  },
   "plugins": [
     "syntax-dynamic-import",
     "syntax-async-functions",
