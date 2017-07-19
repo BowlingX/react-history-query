@@ -30,4 +30,6 @@ jobs:
 
       # run tests!
       - run: npm test
-      - run: npm run semantic-release 2>/dev/null; true
+      - run:
+          name: release if necessary
+          command: npm run semantic-release 2>/dev/null; true
