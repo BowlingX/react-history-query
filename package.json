@@ -5,7 +5,7 @@
   "main": "dist/commonjs/index.js",
   "module": "dist/es6/index.js",
   "files": [
-    "dist",
+    "dist/",
     "src/lib"
   ],
   "scripts": {
@@ -54,14 +54,6 @@
     "reselect": "^3.0.1",
     "shallowequal": "^1.0.2"
   },
-  "npmFileMap": [
-    {
-      "basePath": "/dist/",
-      "files": [
-        "*.js"
-      ]
-    }
-  ],
   "devDependencies": {
     "@storybook/addon-info": "^3.1.6",
     "@storybook/react": "^3.1.7",
