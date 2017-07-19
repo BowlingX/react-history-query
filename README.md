@@ -1,7 +1,7 @@
 react-history-query
 -------------------
 
-[![CircleCI](https://img.shields.io/circleci/project/github/BowlingX/react-history-query.svg?style=flat-square)]()
+[![CircleCI](https://img.shields.io/circleci/project/github/BowlingX/react-history-query.svg?style=flat-square)](https://circleci.com/gh/BowlingX/react-history-query)
 
 A simple HOC to connect component props to query parameters.
 
