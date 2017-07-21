@@ -58,11 +58,10 @@ export default class QueryContainer extends Component {
         return initial;
       }, {});
       this.components[cmp] = { ...this.components[cmp], state: nextState, serialized };
-      // re-save modified history state
-      history.replace(global.location, { __componentState: this.currentComponentState() });
     });
     requestAnimationFrame(() => {
       this.isTransitioning = false;
+      history.replace(global.location, { __componentState: this.currentComponentState() });
     });
   }
 
