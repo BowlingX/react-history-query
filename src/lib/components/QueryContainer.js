@@ -86,7 +86,9 @@ export default class QueryContainer extends Component {
   componentDidMount() {
     const { history } = this.props;
     // save initial state
-    history.replace(global.location, { __componentState: this.currentComponentState(), isInitial: true });
+    history.replace(
+      { ...history.location, state: { __componentState: this.currentComponentState(), isInitial: true } }
+      );
     this.listener = history.listen((location, action) => {
       const historyState = location.state && location.state.__componentState;
       // react to external events
@@ -193,7 +195,10 @@ export default class QueryContainer extends Component {
           this.components[namespace] = {
             options, props, optionsSelector, blankState, state: initialState, serialized
           };
-          this.props.history.replace(this.props.history.location, { __componentState: this.currentComponentState() });
+          this.props.history.replace({
+            ...this.props.history.location,
+            state: { __componentState: this.currentComponentState() }
+          });
           return state;
         },
         unregister: (namespace:string) => {
