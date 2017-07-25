@@ -35,7 +35,7 @@ export default class QueryContainer extends Component {
   /**
    * Handles external push events
    */
-  handlePush(history:Object) {
+  handlePush() {
     this.isTransitioning = true;
     const parsedQuery = this.initialParsedQuery(this.props.history.location);
     Object.keys(this.components).forEach((cmp) => {
@@ -61,7 +61,6 @@ export default class QueryContainer extends Component {
     });
     requestAnimationFrame(() => {
       this.isTransitioning = false;
-      history.replace(global.location, { __componentState: this.currentComponentState() });
     });
   }
 
@@ -92,7 +91,7 @@ export default class QueryContainer extends Component {
       const historyState = location.state && location.state.__componentState;
       // react to external events
       if (action === 'PUSH' && !historyState) {
-        this.handlePush(history);
+        this.handlePush();
         return;
       }
       const previousState = historyState ?
@@ -194,6 +193,7 @@ export default class QueryContainer extends Component {
           this.components[namespace] = {
             options, props, optionsSelector, blankState, state: initialState, serialized
           };
+          this.props.history.replace(this.props.history.location, { __componentState: this.currentComponentState() });
           return state;
         },
         unregister: (namespace:string) => {
