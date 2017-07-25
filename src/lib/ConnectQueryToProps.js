@@ -48,6 +48,7 @@ const connectQueryToProps = (namespace: string, options: Object) => (InnerCompon
     }
 
     componentWillReceiveProps(props: Object) {
+      this.context.queryManager.updateProps(namespace, props);
       this.setState(props);
     }
 
