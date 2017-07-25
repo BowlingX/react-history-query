@@ -38,28 +38,29 @@ export default class QueryContainer extends Component {
   handlePush() {
     this.isTransitioning = true;
     const parsedQuery = this.initialParsedQuery(this.props.history.location);
-    Object.keys(this.components).forEach((cmp) => {
-      const { blankState, options, props, state } = this.components[cmp];
-      const serialized = {};
-      const nextState = Object.keys(options).reduce((initial, optionKey) => {
-        const queryValue = parsedQuery[`${cmp}.${optionKey}`];
-        const blankStateValue = blankState[optionKey];
-        let newState = blankStateValue;
-        if (queryValue !== undefined) {
-          newState = options[optionKey].fromQueryString(queryValue, props);
-          serialized[`${cmp}.${optionKey}`] = queryValue;
-        } else if (blankStateValue !== undefined) {
-          const oldValue = state[optionKey];
-          if (!shallowEqual(oldValue, blankStateValue)) {
-            options[optionKey].fromHistory(blankStateValue, props);
-          }
-        }
-        initial[optionKey] = newState;
-        return initial;
-      }, {});
-      this.components[cmp] = { ...this.components[cmp], state: nextState, serialized };
-    });
+    // we skip one cycle to support proper handling of route switches / prop updates in fromHistory
     requestAnimationFrame(() => {
+      Object.keys(this.components).forEach((cmp) => {
+        const { blankState, options, props, state } = this.components[cmp];
+        const serialized = {};
+        const nextState = Object.keys(options).reduce((initial, optionKey) => {
+          const queryValue = parsedQuery[`${cmp}.${optionKey}`];
+          const blankStateValue = blankState[optionKey];
+          let newState = blankStateValue;
+          if (queryValue !== undefined) {
+            newState = options[optionKey].fromQueryString(queryValue, props);
+            serialized[`${cmp}.${optionKey}`] = queryValue;
+          } else if (blankStateValue !== undefined) {
+            const oldValue = state[optionKey];
+            if (!shallowEqual(oldValue, blankStateValue)) {
+              options[optionKey].fromHistory(blankStateValue, props);
+            }
+          }
+          initial[optionKey] = newState;
+          return initial;
+        }, {});
+        this.components[cmp] = { ...this.components[cmp], state: nextState, serialized };
+      });
       this.isTransitioning = false;
     });
   }
