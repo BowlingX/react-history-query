@@ -24,6 +24,8 @@ const SecondRoute = () => {
     <div>
       <h1>Second-Route</h1>
       <Link to="/first?form1.p.checked=true">Go to first</Link>
+      <br />
+      <Link to='/second?form2.p.checked=true&form2.p.text="initialText"'>Set some defaults</Link>
       <Form2 />
     </div>
   );

@@ -61,6 +61,10 @@ export default class QueryContainer extends Component {
         }, {});
         this.components[cmp] = { ...this.components[cmp], state: nextState, serialized };
       });
+      this.props.history.replace({
+        ...this.props.history.location,
+        state: { __componentState: this.currentComponentState() }
+      });
       this.isTransitioning = false;
     });
   }
