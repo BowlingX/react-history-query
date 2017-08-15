@@ -35,7 +35,7 @@ export default class QueryContainer extends Component {
   /**
    * Handles external push events
    */
-  handlePush() {
+  handlePush(previousState:Object) {
     this.isTransitioning = true;
     const parsedQuery = this.initialParsedQuery(this.props.history.location);
     // we skip one cycle to support proper handling of route switches / prop updates in fromHistory
@@ -63,7 +63,7 @@ export default class QueryContainer extends Component {
       });
       this.props.history.replace({
         ...this.props.history.location,
-        state: { __componentState: this.currentComponentState() }
+        state: { ...previousState, __componentState: this.currentComponentState() }
       });
       this.isTransitioning = false;
     });
@@ -98,7 +98,7 @@ export default class QueryContainer extends Component {
       const historyState = location.state && location.state.__componentState;
       // react to external events
       if (action === 'PUSH' && !historyState) {
-        this.handlePush();
+        this.handlePush(location.state);
         return;
       }
       const previousState = historyState ?
