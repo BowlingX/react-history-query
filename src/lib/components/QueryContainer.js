@@ -92,7 +92,9 @@ export default class QueryContainer extends Component {
     const { history } = this.props;
     // save initial state
     history.replace(
-      { ...history.location, state: { __componentState: this.currentComponentState(), isInitial: true } }
+      { ...history.location,
+        state: { ...history.location.state, __componentState: this.currentComponentState(), isInitial: true }
+      }
       );
     this.listener = history.listen((location, action) => {
       const historyState = location.state && location.state.__componentState;
@@ -202,7 +204,7 @@ export default class QueryContainer extends Component {
           };
           this.props.history.replace({
             ...this.props.history.location,
-            state: { ...this.props.history.state, __componentState: this.currentComponentState() }
+            state: { ...this.props.history.location.state, __componentState: this.currentComponentState() }
           });
           return state;
         },
