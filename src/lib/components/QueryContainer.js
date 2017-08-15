@@ -202,7 +202,7 @@ export default class QueryContainer extends Component {
           };
           this.props.history.replace({
             ...this.props.history.location,
-            state: { __componentState: this.currentComponentState() }
+            state: { ...this.props.history.state, __componentState: this.currentComponentState() }
           });
           return state;
         },
