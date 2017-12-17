@@ -29,8 +29,7 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
 
-      # run tests!
-      #- run: npm test
+      - run: yarn run test
       - run:
           name: release if necessary
           command: yarn run semantic-release
