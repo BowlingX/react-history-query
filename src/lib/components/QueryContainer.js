@@ -2,7 +2,8 @@
  *@flow
  */
 
-import React, { Component, Children } from 'react';
+import React, { Component } from 'react';
+import type { Node } from 'react';
 import queryString from 'query-string';
 import PropTypes from 'prop-types';
 import { createSelector } from 'reselect';
@@ -11,10 +12,10 @@ import shallowEqual from 'shallowequal';
 
 type QueryContainerProps = {
   history: Object,
-  children: Children
+  children: Node
 }
 
-export default class QueryContainer extends Component {
+export default class QueryContainer extends Component<QueryContainerProps> {
   listener: ?Function;
 
   components: Object = {};
@@ -22,8 +23,6 @@ export default class QueryContainer extends Component {
   initialParsedQuery: (location:Object) => Object;
 
   isTransitioning: boolean = false;
-
-  props:QueryContainerProps;
 
   constructor(props: QueryContainerProps) {
     super(props);

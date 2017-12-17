@@ -1,9 +1,9 @@
 /**
  * @flow
  */
-/* global ReactClass */
 
 import React, { Component } from 'react';
+import type { ComponentType } from 'react';
 import PropTypes from 'prop-types';
 import shallowEqual from 'shallowequal';
 
@@ -13,59 +13,58 @@ const getOptionsFromProps = (options: Object, props: Object) => {
   );
 };
 
-const connectQueryToProps = (namespace: string, options: Object) => (InnerComponent: ReactClass<any> | Function) => {
-  return class extends Component {
-    static contextTypes = {
-      queryManager: PropTypes.object
-    };
+const connectQueryToProps =
+  (namespace: string, options: Object) => (InnerComponent: ComponentType<*>) => {
+    return class extends Component<*, *> {
+      static contextTypes = {
+        queryManager: PropTypes.object
+      };
 
-    state: Object;
+      context: Object;
 
-    context: Object;
+      innerComponentRef: Element;
 
-    innerComponentRef: Element;
-
-    componentWillMount() {
-      const state = this.context.queryManager.register(namespace, options, this.props);
-      this.setState(state);
-    }
-
-    shouldComponentUpdate(nextProps: Object, nextState: Object) {
-      return !shallowEqual(this.state, nextState);
-    }
-
-    componentDidUpdate(prevProps: Object, prevState: Object) {
-      if (this.context.queryManager.isTransitioning()) {
-        return;
+      componentWillMount() {
+        const state = this.context.queryManager.register(namespace, options, this.props);
+        this.setState(state);
       }
+
+      shouldComponentUpdate(nextProps: Object, nextState: Object) {
+        return !shallowEqual(this.state, nextState);
+      }
+
+      componentDidUpdate(prevProps: Object, prevState: Object) {
+        if (this.context.queryManager.isTransitioning()) {
+          return;
+        }
       // check if the parameters actually changed:
-      if (!shallowEqual(
+        if (!shallowEqual(
           getOptionsFromProps(options, prevState),
           getOptionsFromProps(options, this.state))
       ) {
-        this.context.queryManager.pushChanges(namespace, this.state);
+          this.context.queryManager.pushChanges(namespace, this.state);
+        }
       }
-    }
 
-    componentWillReceiveProps(props: Object) {
-      this.context.queryManager.updateProps(namespace, props);
-      this.setState(props);
-    }
-
-    componentWillUnmount() {
-      if (this.context.queryManager) {
-        this.context.queryManager.unregister(namespace);
+      componentWillReceiveProps(props: Object) {
+        this.context.queryManager.updateProps(namespace, props);
+        this.setState(props);
       }
-    }
 
-    getWrappedInstance() {
-      return this.innerComponentRef;
-    }
+      componentWillUnmount() {
+        if (this.context.queryManager) {
+          this.context.queryManager.unregister(namespace);
+        }
+      }
 
-    render() {
-      return <InnerComponent ref={(instance) => { this.innerComponentRef = instance; }} {...this.state} />;
-    }
+      getWrappedInstance() {
+        return this.innerComponentRef;
+      }
+
+      render() {
+        return <InnerComponent ref={(instance) => { this.innerComponentRef = instance; }} {...this.state} />;
+      }
   };
-};
+  };
 
 export default connectQueryToProps;

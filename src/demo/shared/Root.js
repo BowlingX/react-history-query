@@ -2,7 +2,7 @@
  * @flow
  */
 
-import React from 'react';
+import * as React from 'react';
 import { createStore, combineReducers, compose } from 'redux';
 import { reducer as formReducer } from 'redux-form';
 import createHistory from 'history/createBrowserHistory';

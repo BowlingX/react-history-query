@@ -5,6 +5,17 @@
       "modules": false
     }]
   ],
+  "plugins": [
+    "syntax-dynamic-import",
+    "syntax-async-functions",
+    "transform-class-properties",
+    "transform-flow-strip-types",
+    "transform-object-rest-spread",
+    "transform-regenerator",
+    "transform-runtime",
+    "transform-proto-to-assign",
+    "syntax-export-extensions"
+  ],
   "env": {
     "test": {
       "presets": [
@@ -18,7 +29,8 @@
         "transform-object-rest-spread",
         "transform-regenerator",
         "transform-runtime",
-        "transform-proto-to-assign"
+        "transform-proto-to-assign",
+        "syntax-export-extensions"
       ]
     },
     "commonjs": {
@@ -39,18 +51,9 @@
         "transform-object-rest-spread",
         "transform-regenerator",
         "transform-runtime",
-        "transform-proto-to-assign"
+        "transform-proto-to-assign",
+        "syntax-export-extensions"
       ]
     }
-  },
-  "plugins": [
-    "syntax-dynamic-import",
-    "syntax-async-functions",
-    "transform-class-properties",
-    "transform-flow-strip-types",
-    "transform-object-rest-spread",
-    "transform-regenerator",
-    "transform-runtime",
-    "transform-proto-to-assign"
-  ]
+  }
 }

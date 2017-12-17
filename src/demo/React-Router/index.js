@@ -1,7 +1,7 @@
 /**
  * @flow
  */
-import React from 'react';
+import * as React from 'react';
 import { Router, Link, Route } from 'react-router-dom';
 import Root, { history } from '../shared/Root';
 import { formCreator } from '../Redux-Form/index';

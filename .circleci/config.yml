@@ -8,12 +8,15 @@ jobs:
     docker:
       # specify the version you desire here
       - image: circleci/node:8.0-browsers
-
+      environment:
+        CHROME_BIN: "/usr/bin/google-chrome"
     working_directory: ~/repo
 
     steps:
       - checkout
-
+      - run:
+          name: Install yarn
+          command: sudo npm install -g yarn
       # Download and cache dependencies
       - restore_cache:
           keys:
@@ -21,7 +24,7 @@ jobs:
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
 
-      - run: npm install
+      - run: yarn install
 
       - save_cache:
           paths:
@@ -32,4 +35,4 @@ jobs:
       #- run: npm test
       - run:
           name: release if necessary
-          command: npm run semantic-release
+          command: yarn run semantic-release

@@ -2,7 +2,7 @@
  * @flow
  */
 
-import React from 'react';
+import * as React from 'react';
 import { Field, reduxForm, getFormValues } from 'redux-form';
 import { connect } from 'react-redux';
 import connectQueryToProps from '../../lib/ConnectQueryToProps';
@@ -13,17 +13,20 @@ type Props = {
   onChange: () => void,
   handleSubmit: () => void
 };
-const SimpleForm = (props: Props) => {
-  const { handleSubmit } = props;
-  return (
-    <form onSubmit={handleSubmit}>
-      <p>Please check</p>
-      <Field name="checked" component="input" type="checkbox" />
-      <Field name="text" component="input" type="text" />
-      <button type="submit">Submit</button>
-    </form>
-  );
-};
+
+class SimpleForm extends React.Component<Props> { // eslint-disable-line
+  render() {
+    const { handleSubmit } = this.props;
+    return (
+      <form onSubmit={handleSubmit}>
+        <p>Please check</p>
+        <Field name="checked" component="input" type="checkbox" />
+        <Field name="text" component="input" type="text" />
+        <button type="submit">Submit</button>
+      </form>
+    );
+  }
+}
 
 export const formCreator = (name:string) => {
   let Export = connectQueryToProps(name, {
@@ -47,7 +50,7 @@ export const formCreator = (name:string) => {
       [`p.checked`]: formValues.checked || false,
       [`p.text`]: formValues.text
     };
-  })(Export);
+  }, {})(Export);
 
   return Export;
 };
