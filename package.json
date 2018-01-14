@@ -40,7 +40,7 @@
   },
   "homepage": "https://github.com/BowlingX/react-history-query#readme",
   "peerDependencies": {
-    "react": "^15.0.0|^16.0.0"
+    "react": "^15.0.0 || ^16.0.0"
   },
   "dependencies": {
     "history": "^4.6.3",
