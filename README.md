@@ -74,7 +74,7 @@ Component = connectQueryToProps('namespace', {
       }
   },
   secondProp: { /*...*/ }
-})(Component);
+} /*, false // set to true to make ref available with `getWrappedInstance`*/ )(Component);
 
 
 // connect redux state..redux form etc.

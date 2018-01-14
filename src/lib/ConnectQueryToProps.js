@@ -14,7 +14,7 @@ const getOptionsFromProps = (options: Object, props: Object) => {
 };
 
 const connectQueryToProps =
-  (namespace: string, options: Object) => (InnerComponent: ComponentType<*>) => {
+  (namespace: string, options: Object, makeRefAvailable: boolean = false) => (InnerComponent: ComponentType<*>) => {
     return class extends Component<*, *> {
       static contextTypes = {
         queryManager: PropTypes.object
@@ -22,7 +22,7 @@ const connectQueryToProps =
 
       context: Object;
 
-      innerComponentRef: Element;
+      innerComponentRef: ?Element;
 
       componentWillMount() {
         const state = this.context.queryManager.register(namespace, options, this.props);
@@ -62,7 +62,9 @@ const connectQueryToProps =
       }
 
       render() {
-        return <InnerComponent ref={(instance) => { this.innerComponentRef = instance; }} {...this.state} />;
+        const additionalProps = makeRefAvailable ?
+          { ref: (instance) => { this.innerComponentRef = instance; } } : {};
+        return <InnerComponent {...additionalProps} {...this.state} />;
       }
   };
   };
