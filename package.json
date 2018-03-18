@@ -23,10 +23,7 @@
     "url": "https://github.com/BowlingX/react-history-query.git"
   },
   "release": {
-    "debug": false,
-    "verifyConditions": {
-      "path": "./node_modules/semantic-release/src/lib/plugin-noop.js"
-    }
+    "debug": false
   },
   "keywords": [
     "react",
