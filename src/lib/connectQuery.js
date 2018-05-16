@@ -13,6 +13,8 @@ const connectQuery =
         queryManager: PropTypes.object
       };
 
+      innerComponentRef: ?Element;
+
       render() {
         const { queryManager } = this.context;
         const additionalProps = makeRefAvailable ?

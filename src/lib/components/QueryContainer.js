@@ -216,7 +216,7 @@ export default class QueryContainer extends Component<QueryContainerProps> {
           return true;
         },
         /* generates the query string for the given namespace(s) */
-        createQueryString: (...namespaces) => {
+        createQueryString: (...namespaces: Array<string>) => {
           namespaces.filter(n => this.components[n]).map((key) => {
             return queryString.stringify(this.components[key].serialized);
           }).join('&');
