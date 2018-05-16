@@ -101,6 +101,21 @@ const Root = () => {
 
 ```
 
+## Dealing with State
+
+You might want access to the current query parameters of a given namespace. This is what the `connectQuery` hoc is for.
+It provides the following props:
+
+- `createQueryString(...namespaces)` - pass a list of `namespaces` as argument, e.g. `createQueryString('ns1', 'ns2')`.
+It will generate the current query string for that.
+
+- `persistCurrentState(namespace: string)` - This will replace the initial state of the namespace with the current state.
+This means, If you go back to any location where there are no / only partially query parameters for this namespace, it will load them
+from this new initial state.
+
+- `__unsafe__queryManager` - this will give you access to the query manager directly. 
+Be careful what you do here, because it might break the state handling
+
 ## Server side rendering
 
 Tested and working fine. Instead of `createBrowserHistory` use `createMemoryHistory` from the `history` package.

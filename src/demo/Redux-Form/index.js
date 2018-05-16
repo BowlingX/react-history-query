@@ -5,7 +5,7 @@
 import * as React from 'react';
 import { Field, reduxForm, getFormValues } from 'redux-form';
 import { connect } from 'react-redux';
-import connectQueryToProps from '../../lib/ConnectQueryToProps';
+import connectQueryToProps from '../../lib/connectQueryToProps';
 import Root, { parameter } from '../shared/Root';
 
 type Props = {

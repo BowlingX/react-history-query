@@ -207,6 +207,20 @@ export default class QueryContainer extends Component<QueryContainerProps> {
           });
           return state;
         },
+        /* will replace the blank state with the current state */
+        persistCurrentState: (namespace: string): boolean => {
+          if (!this.components[namespace]) {
+            return false;
+          }
+          this.components[namespace].blankState = this.components[namespace].state;
+          return true;
+        },
+        /* generates the query string for the given namespace(s) */
+        createQueryString: (...namespaces) => {
+          namespaces.filter(n => this.components[n]).map((key) => {
+            return queryString.stringify(this.components[key].serialized);
+          }).join('&');
+        },
         unregister: (namespace:string) => {
           this.components[namespace].optionsSelector.clearCache();
           delete this.components[namespace];
