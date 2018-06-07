@@ -24,6 +24,8 @@ export default class QueryContainer extends Component<QueryContainerProps> {
 
   isTransitioning: boolean = false;
 
+  namespaceGc = {}
+
   constructor(props: QueryContainerProps) {
     super(props);
     const searchSelector = location => location.search;
@@ -169,7 +171,8 @@ export default class QueryContainer extends Component<QueryContainerProps> {
         },
         register: (namespace: string, options: Object, props: Object) => {
           if (this.components[namespace]) {
-            throw new Error(`connectQueryToProps: Namespace '${namespace}' already registered.`);
+            this.namespaceGc[namespace] += 1;
+            return this.components[namespace].state;
           }
           const keySelector = state => state.key;
           const valueSelector = state => state.value;
@@ -201,6 +204,7 @@ export default class QueryContainer extends Component<QueryContainerProps> {
           this.components[namespace] = {
             options, props, optionsSelector, blankState, state: initialState, serialized
           };
+          this.namespaceGc[namespace] = 1;
           this.props.history.replace({
             ...this.props.history.location,
             state: { ...this.props.history.location.state, __componentState: this.currentComponentState() }
@@ -222,8 +226,11 @@ export default class QueryContainer extends Component<QueryContainerProps> {
           }).join('&');
         },
         unregister: (namespace:string) => {
-          this.components[namespace].optionsSelector.clearCache();
-          delete this.components[namespace];
+          this.namespaceGc[namespace] -= 1;
+          if (this.namespaceGc[namespace] === 0) {
+            this.components[namespace].optionsSelector.clearCache();
+            delete this.components[namespace];
+          }
         },
         isTransitioning: () => this.isTransitioning
       }
