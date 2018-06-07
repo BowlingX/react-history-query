@@ -134,7 +134,7 @@ export default class QueryContainer extends Component<QueryContainerProps> {
   calculateQueryString() {
     return Object.keys(this.components).map((key) => {
       return queryString.stringify(this.components[key].serialized);
-    }).join('&');
+    }).filter(s => s && s.length > 0).join('&');
   }
 
   getChildContext() {
@@ -224,7 +224,7 @@ export default class QueryContainer extends Component<QueryContainerProps> {
         createQueryString: (...namespaces: Array<string>) => {
           return namespaces.filter(n => this.components[n]).map((key) => {
             return queryString.stringify(this.components[key].serialized);
-          }).join('&');
+          }).filter(s => s && s.length > 0).join('&');
         },
         unregister: (namespace:string) => {
           this.namespaceGc[namespace] -= 1;
