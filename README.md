@@ -69,7 +69,7 @@ Component = connectQueryToProps('namespace', {
         props.dispatch({ type: 'SET_VALUE', value });
       },
       // ..optional, return true to skip the parameter
-      skip: (value) => {
+      skip: (value, props: Object) => {
               
       }
   },

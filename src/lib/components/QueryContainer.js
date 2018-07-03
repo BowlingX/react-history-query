@@ -176,7 +176,7 @@ export default class QueryContainer extends Component<QueryContainerProps> {
           const keySelector = state => state.key;
           const valueSelector = state => state.value;
           const optionsSelector = createCachedSelector(keySelector, valueSelector, (key, value) => {
-            return !(options[key].skip && options[key].skip(value)) ? {
+            return !(options[key].skip && options[key].skip(value, props)) ? {
               [`${namespace}.${key}`]: options[key].toQueryString(value)
             } : {};
           })((state, key) => key);
@@ -203,7 +203,7 @@ export default class QueryContainer extends Component<QueryContainerProps> {
           this.components[namespace] = {
             options, props, optionsSelector, blankState, state: initialState, serialized
           };
-          if(!this.namespaceGc[namespace]) {
+          if (!this.namespaceGc[namespace]) {
             this.namespaceGc[namespace] = 1;
           }
           this.props.history.replace({
