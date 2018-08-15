@@ -229,8 +229,10 @@ export default class QueryContainer extends Component<QueryContainerProps> {
         unregister: (namespace:string) => {
           this.namespaceGc[namespace] -= 1;
           if (this.namespaceGc[namespace] === 0) {
-            this.components[namespace].optionsSelector.clearCache();
-            delete this.components[namespace];
+            if (this.components[namespace] !== undefined) {
+              this.components[namespace].optionsSelector.clearCache();
+              delete this.components[namespace];
+            }
             delete this.namespaceGc[namespace];
           }
         },
