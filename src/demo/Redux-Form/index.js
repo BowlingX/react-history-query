@@ -28,8 +28,8 @@ class SimpleForm extends React.Component<Props> { // eslint-disable-line
   }
 }
 
-export const formCreator = (name:string) => {
-  let Export = connectQueryToProps(name, {
+export const formCreator = (name:string, ns:?string) => {
+  let Export = connectQueryToProps(ns, {
     [`p.checked`]: parameter('checked'),
     [`p.text`]: parameter('text')
   })(SimpleForm);
@@ -39,7 +39,8 @@ export const formCreator = (name:string) => {
     form: name
   })(Export);
 
-  Export = connect((state) => {
+  // $FlowFixMe: ignore
+  Export = connect((state: Object) => {
     const initialValues = {
       checked: false,
       text: ''

@@ -41,7 +41,10 @@ export const parameter = (name:string) => ({
 const Root = (props:Object) => {
   return (
     <Provider store={store}>
-      <QueryContainer history={history} {...props} />
+      { /* $FlowFixMe: React Flow typings are not updated to React 16.3 yet */ }
+      <React.StrictMode>
+        <QueryContainer history={history} {...props} />
+      </React.StrictMode>
     </Provider>
   );
 };

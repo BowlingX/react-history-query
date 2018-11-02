@@ -3,9 +3,8 @@
  */
 
 import React, { Component } from 'react';
-import type { Node } from 'react';
+import type { Node, Context } from 'react';
 import queryString from 'query-string';
-import PropTypes from 'prop-types';
 import { createSelector } from 'reselect';
 import createCachedSelector from 're-reselect';
 import shallowEqual from 'shallowequal';
@@ -14,6 +13,21 @@ type QueryContainerProps = {
   history: Object,
   children: Node
 }
+
+export type QueryManager = {
+  pushChanges: Function,
+  updateProps: Function,
+  register: Function,
+  persistCurrentState: Function,
+  createQueryString: Function,
+  unregister: Function,
+  isTransitioning: Function
+}
+
+export const QueryManagerContext: Context<?QueryManager> = React.createContext();
+
+
+const DEFAULT_NAMESPACE = '__d';
 
 export default class QueryContainer extends Component<QueryContainerProps> {
   listener: ?Function;
@@ -26,11 +40,18 @@ export default class QueryContainer extends Component<QueryContainerProps> {
 
   namespaceGc = {}
 
+  queryManager: Object
+
   constructor(props: QueryContainerProps) {
     super(props);
     const searchSelector = location => location.search;
     this.initialParsedQuery =
     createSelector(searchSelector, search => queryString.parse(search));
+    this.queryManager = this.initQueryManager();
+  }
+
+  static formatNamespace(ns:?string, key:string) {
+    return ns && ns !== DEFAULT_NAMESPACE ? `${ns}.${key}` : key;
   }
 
   /**
@@ -45,12 +66,12 @@ export default class QueryContainer extends Component<QueryContainerProps> {
         const { blankState, options, props, state } = this.components[cmp];
         const serialized = {};
         const nextState = Object.keys(options).reduce((initial, optionKey) => {
-          const queryValue = parsedQuery[`${cmp}.${optionKey}`];
+          const queryValue = parsedQuery[QueryContainer.formatNamespace(cmp, optionKey)];
           const blankStateValue = blankState[optionKey];
           let newState = blankStateValue;
           if (queryValue !== undefined) {
             newState = options[optionKey].fromQueryString(queryValue, props);
-            serialized[`${cmp}.${optionKey}`] = queryValue;
+            serialized[QueryContainer.formatNamespace(cmp, optionKey)] = queryValue;
           } else if (blankStateValue !== undefined) {
             const oldValue = state[optionKey];
             if (!shallowEqual(oldValue, blankStateValue)) {
@@ -113,10 +134,6 @@ export default class QueryContainer extends Component<QueryContainerProps> {
     });
   }
 
-  static childContextTypes = {
-    queryManager: PropTypes.object
-  };
-
   currentComponentState() {
     return Object.keys(this.components).reduce((initial, key) => ({
       ...initial,
@@ -137,107 +154,107 @@ export default class QueryContainer extends Component<QueryContainerProps> {
     }).filter(s => s && s.length > 0).join('&');
   }
 
-  getChildContext() {
+  initQueryManager(): QueryManager {
     return {
-      queryManager: {
-        pushChanges: (namespace: string, props: Object) => {
-          const options = this.components[namespace].options;
-          const optionsSelector = this.components[namespace].optionsSelector;
-          const next = Object.keys(options).reduce((initial, key) => {
-            const value = props[key];
-            if (value !== undefined) {
-              const nextValue = optionsSelector({ key, value }, key);
-              return {
-                state: { ...initial.state, [key]: value },
-                serialized: {
-                  ...initial.serialized,
-                  ...nextValue
-                }
-              };
-            }
-            return initial;
-          }, {
-            state: {},
-            serialized: {}
-          });
-          this.components[namespace] = { ...this.components[namespace], ...next };
-          this.props.history.push(
+      pushChanges: (namespace: string = DEFAULT_NAMESPACE, props: Object) => {
+        const options = this.components[namespace].options;
+        const optionsSelector = this.components[namespace].optionsSelector;
+        const next = Object.keys(options).reduce((initial, key) => {
+          const value = props[key];
+          if (value !== undefined) {
+            const nextValue = optionsSelector({ key, value }, key);
+            return {
+              state: { ...initial.state, [key]: value },
+              serialized: {
+                ...initial.serialized,
+                ...nextValue
+              }
+            };
+          }
+          return initial;
+        }, {
+          state: {},
+          serialized: {}
+        });
+        this.components[namespace] = { ...this.components[namespace], ...next };
+        this.props.history.push(
             { pathname: location.pathname, search: this.calculateQueryString() },
             { __componentState: this.currentComponentState() }
           );
-        },
-        updateProps: (namespace:string, props:Object) => {
-          this.components[namespace] = { ...this.components[namespace], props };
-        },
-        register: (namespace: string, options: Object, props: Object) => {
-          if (this.components[namespace]) {
-            this.namespaceGc[namespace] += 1;
-          }
-          const keySelector = state => state.key;
-          const valueSelector = state => state.value;
-          const optionsSelector = createCachedSelector(keySelector, valueSelector, (key, value) => {
-            return !(options[key].skip && options[key].skip(value, props)) ? {
-              [`${namespace}.${key}`]: options[key].toQueryString(value)
-            } : {};
-          })((state, key) => key);
+      },
+      updateProps: (namespace: string = DEFAULT_NAMESPACE, props:Object) => {
+        this.components[namespace] = { ...this.components[namespace], props };
+      },
+      register: (namespace: string = DEFAULT_NAMESPACE, options: Object, props: Object) => {
+        if (this.components[namespace]) {
+          this.namespaceGc[namespace] += 1;
+        }
+        const keySelector = state => state.key;
+        const valueSelector = state => state.value;
+        const optionsSelector = createCachedSelector(keySelector, valueSelector, (key, value) => {
+          return !(options[key].skip && options[key].skip(value, props)) ? {
+            [QueryContainer.formatNamespace(namespace, key)]: options[key].toQueryString(value)
+          } : {};
+        })((state, key) => key);
           // blank state = state without query parameters applied
-          const blankState = {};
+        const blankState = {};
           // initial state = state with queryParameters applied (or not if not set)
-          const initialState = {};
+        const initialState = {};
           // serialized query parameter state
-          const serialized = {};
-          const state = Object.keys(options).reduce((initial, key) => {
-            const initialQueryValue = this.initialParsedQuery(this.props.history.location)[`${namespace}.${key}`];
-            if (props[key] !== undefined) {
-              blankState[key] = props[key];
-              initialState[key] = props[key];
-            }
-            if (initialQueryValue !== undefined) {
-              const value = options[key].fromQueryString(initialQueryValue, props);
-              initialState[key] = value;
-              serialized[`${namespace}.${key}`] = initialQueryValue;
-              return { ...initial, [key]: value };
-            }
-            return initial;
-          }, props);
-          this.components[namespace] = {
-            options, props, optionsSelector, blankState, state: initialState, serialized
-          };
-          if (!this.namespaceGc[namespace]) {
-            this.namespaceGc[namespace] = 1;
+        const serialized = {};
+        const state = Object.keys(options).reduce((initial, key) => {
+          const initialQueryValue = this.initialParsedQuery(this.props.history.location)[
+            QueryContainer.formatNamespace(namespace, key)
+            ];
+          if (props[key] !== undefined) {
+            blankState[key] = props[key];
+            initialState[key] = props[key];
           }
-          this.props.history.replace({
-            ...this.props.history.location,
-            state: { ...this.props.history.location.state, __componentState: this.currentComponentState() }
-          });
-          return state;
-        },
+          if (initialQueryValue !== undefined) {
+            const value = options[key].fromQueryString(initialQueryValue, props);
+            initialState[key] = value;
+            serialized[QueryContainer.formatNamespace(namespace, key)] = initialQueryValue;
+            return { ...initial, [key]: value };
+          }
+          return initial;
+        }, props);
+        this.components[namespace] = {
+          options, props, optionsSelector, blankState, state: initialState, serialized
+        };
+        if (!this.namespaceGc[namespace]) {
+          this.namespaceGc[namespace] = 1;
+        }
+        this.props.history.replace({
+          ...this.props.history.location,
+          state: { ...this.props.history.location.state, __componentState: this.currentComponentState() }
+        });
+        return state;
+      },
         /* will replace the blank state with the current state */
-        persistCurrentState: (namespace: string): boolean => {
-          if (!this.components[namespace]) {
-            return false;
-          }
-          this.components[namespace].blankState = this.components[namespace].state;
-          return true;
-        },
+      persistCurrentState: (namespace?: string = DEFAULT_NAMESPACE): boolean => {
+        if (!this.components[namespace]) {
+          return false;
+        }
+        this.components[namespace].blankState = this.components[namespace].state;
+        return true;
+      },
         /* generates the query string for the given namespace(s) */
-        createQueryString: (...namespaces: Array<string>) => {
-          return namespaces.filter(n => this.components[n]).map((key) => {
-            return queryString.stringify(this.components[key].serialized);
-          }).filter(s => s && s.length > 0).join('&');
-        },
-        unregister: (namespace:string) => {
-          this.namespaceGc[namespace] -= 1;
-          if (this.namespaceGc[namespace] === 0) {
-            if (this.components[namespace] !== undefined) {
-              this.components[namespace].optionsSelector.clearCache();
-              delete this.components[namespace];
-            }
-            delete this.namespaceGc[namespace];
+      createQueryString: (...namespaces: Array<?string>) => {
+        return namespaces.filter(n => this.components[n]).map((key) => {
+          return queryString.stringify(this.components[key || DEFAULT_NAMESPACE].serialized);
+        }).filter(s => s && s.length > 0).join('&');
+      },
+      unregister: (namespace?:string = DEFAULT_NAMESPACE) => {
+        this.namespaceGc[namespace] -= 1;
+        if (this.namespaceGc[namespace] === 0) {
+          if (this.components[namespace] !== undefined) {
+            this.components[namespace].optionsSelector.clearCache();
+            delete this.components[namespace];
           }
-        },
-        isTransitioning: () => this.isTransitioning
-      }
+          delete this.namespaceGc[namespace];
+        }
+      },
+      isTransitioning: () => this.isTransitioning
     };
   }
 
@@ -250,6 +267,11 @@ export default class QueryContainer extends Component<QueryContainerProps> {
   }
 
   render() {
-    return React.Children.only(this.props.children);
+    const children = React.Children.only(this.props.children);
+    return (
+      <QueryManagerContext.Provider value={this.queryManager}>
+        {children}
+      </QueryManagerContext.Provider>
+    );
   }
 }

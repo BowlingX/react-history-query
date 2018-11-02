@@ -51,7 +51,7 @@ import { connectQueryToProps } from 'react-history-query';
 
 let Component = () => { /*...*/ }
 
-Component = connectQueryToProps('namespace', {
+Component = connectQueryToProps('namespace' /* optional, pass undefined or null for global namespace */, {
   prop: {
 
       // called when property should be serialized to query param
@@ -109,7 +109,7 @@ It provides the following props:
 - `createQueryString(...namespaces)` - pass a list of `namespaces` as argument, e.g. `createQueryString('ns1', 'ns2')`.
 It will generate the current query string for that.
 
-- `persistCurrentState(namespace: string)` - This will replace the initial state of the namespace with the current state.
+- `persistCurrentState(namespace?: string)` - This will replace the initial state of the namespace with the current state.
 This means, If you go back to any location where there are no / only partially query parameters for this namespace, it will load them
 from this new initial state.
 
