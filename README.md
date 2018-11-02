@@ -25,6 +25,10 @@ It is working completely standalone and also great with `react-router`, `redux` 
     //.. or with yarn
     
     yarn add react-history-query
+    
+## Requirements
+
+- react 16.4. (uses new context API. please use 1.x for legacy support.)
 
 ## Usage
 
