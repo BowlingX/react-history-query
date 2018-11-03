@@ -32,7 +32,13 @@ export type QueryManagerContextType = {
 export const QueryManagerContext: Context<?QueryManagerContextType> = React.createContext();
 
 
-const DEFAULT_NAMESPACE = '__d';
+export const DEFAULT_NAMESPACE = '__d';
+
+export const createQueryString = (components: Object, ...namespaces: Array<?string>) => {
+  return namespaces.filter(n => components[n]).map((key) => {
+    return queryString.stringify(components[key || DEFAULT_NAMESPACE].serialized);
+  }).filter(s => s && s.length > 0).join('&');
+};
 
 type State = {
   persistedComponents: Object
@@ -270,10 +276,8 @@ export default class QueryContainer extends PureComponent<QueryContainerProps, S
         return true;
       },
         /* generates the query string for the given namespace(s) */
-      createQueryString: (...namespaces: Array<?string>) => {
-        return namespaces.filter(n => this.components[n]).map((key) => {
-          return queryString.stringify(this.components[key || DEFAULT_NAMESPACE].serialized);
-        }).filter(s => s && s.length > 0).join('&');
+      createQueryString: (...namespaces: Array<string>) => {
+        return createQueryString(this.components, ...namespaces);
       },
       unregister: (namespace?:string = DEFAULT_NAMESPACE) => {
         this.namespaceGc[namespace] -= 1;
