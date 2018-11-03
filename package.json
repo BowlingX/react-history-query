@@ -42,9 +42,9 @@
   },
   "dependencies": {
     "history": "^4.7.2",
-    "immutability-helper": "^2.8.1",
     "query-string": "^4.3.4",
     "re-reselect": "^0.5.0",
+    "reselect": "^3.0.1",
     "shallowequal": "^1.0.2"
   },
   "devDependencies": {
