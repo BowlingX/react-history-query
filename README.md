@@ -110,6 +110,8 @@ const Root = () => {
 You might want access to the current query parameters of a given namespace. This is what the `connectQuery` hoc is for.
 It provides the following props:
 
+- `queries` - the serialized queries for each namespace, let's you for example create a link with the current calculated state.
+
 - `createQueryString(...namespaces)` - pass a list of `namespaces` as argument, e.g. `createQueryString('ns1', 'ns2')`.
 It will generate the current query string for that.
 
