@@ -24,7 +24,12 @@ export type QueryManager = {
   isTransitioning: Function
 }
 
-export const QueryManagerContext: Context<?QueryManager> = React.createContext();
+export type QueryManagerContextType = {
+  queryManager: QueryManager,
+  queries: Object
+}
+
+export const QueryManagerContext: Context<?QueryManagerContextType> = React.createContext();
 
 
 const DEFAULT_NAMESPACE = '__d';
@@ -45,6 +50,10 @@ export default class QueryContainer extends PureComponent<QueryContainerProps, S
   namespaceGc = {}
 
   queryManager: Object
+
+  state = {
+    persistedComponents: {}
+  }
 
   constructor(props: QueryContainerProps) {
     super(props);
@@ -86,13 +95,12 @@ export default class QueryContainer extends PureComponent<QueryContainerProps, S
           return initial;
         }, {});
         this.components[cmp] = { ...this.components[cmp], state: nextState, serialized };
-        const persistedComponents = this.state.persistedComponents
-        this.setState({ persistedComponents: { ...persistedComponents, [cmp]: serialized } });
       });
       this.props.history.replace({
         ...this.props.history.location,
         state: { ...previousState, __componentState: this.currentComponentState() }
       });
+      this.refreshState();
       this.isTransitioning = false;
     });
   }
@@ -109,11 +117,24 @@ export default class QueryContainer extends PureComponent<QueryContainerProps, S
             // mutate current state with old value,
             // this way we can only call fromHistory where required
             this.components[key].state[propKey] = oldValue;
+            this.components[key].serialized = { ...this.components[key].serialized,
+              ...(this.components[key].optionsSelector({ key: propKey, value: oldValue }, propKey)) };
           }
         });
       }
     });
+    // recalculate serialized state
+    this.refreshState();
     this.isTransitioning = false;
+  }
+
+  refreshState() {
+    this.setState({ persistedComponents: Object.keys(this.components).reduce((previous, next) => {
+      return {
+        ...previous,
+        [next]: this.components[next].serialized
+      };
+    }, {}) });
   }
 
   componentDidMount() {
@@ -187,6 +208,7 @@ export default class QueryContainer extends PureComponent<QueryContainerProps, S
             { pathname: location.pathname, search: this.calculateQueryString() },
             { __componentState: this.currentComponentState() }
           );
+        this.updateState(namespace, next.serialized);
       },
       updateProps: (namespace: string = DEFAULT_NAMESPACE, props:Object) => {
         this.components[namespace] = { ...this.components[namespace], props };
@@ -235,9 +257,7 @@ export default class QueryContainer extends PureComponent<QueryContainerProps, S
           state: { ...this.props.history.location.state, __componentState: this.currentComponentState() }
         });
 
-        const persistedComponents = this.state.persistedComponents;
-
-        this.setState({ persistedComponents: { ...persistedComponents, [namespace]: serialized } });
+        this.updateState(namespace, serialized);
 
         return state;
       },
@@ -264,9 +284,16 @@ export default class QueryContainer extends PureComponent<QueryContainerProps, S
           }
           delete this.namespaceGc[namespace];
         }
+        const { [namespace]: value, ...rest } = this.state.persistedComponents;
+        this.setState({ persistedComponents: rest });
       },
       isTransitioning: () => this.isTransitioning
     };
+  }
+
+  updateState(ns: string, serialized: Object) {
+    const persistedComponents = this.state.persistedComponents;
+    this.setState({ persistedComponents: { ...persistedComponents, [ns]: serialized } });
   }
 
   componentWillUnmount() {
@@ -279,8 +306,9 @@ export default class QueryContainer extends PureComponent<QueryContainerProps, S
 
   render() {
     const children = React.Children.only(this.props.children);
+    const { persistedComponents } = this.state;
     return (
-      <QueryManagerContext.Provider value={this.queryManager}>
+      <QueryManagerContext.Provider value={{ queryManager: this.queryManager, queries: persistedComponents }}>
         {children}
       </QueryManagerContext.Provider>
     );

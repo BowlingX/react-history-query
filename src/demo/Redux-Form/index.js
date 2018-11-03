@@ -7,12 +7,18 @@ import { Field, reduxForm, getFormValues } from 'redux-form';
 import { connect } from 'react-redux';
 import connectQueryToProps from '../../lib/connectQueryToProps';
 import Root, { parameter } from '../shared/Root';
+import { connectQuery } from "../../lib";
 
 type Props = {
   checked: boolean,
   onChange: () => void,
   handleSubmit: () => void
 };
+
+let CurrentQuery = ({ queries }: Object) => {
+  return (<div>Serialized: {JSON.stringify(queries)}</div>);
+};
+CurrentQuery = connectQuery()(CurrentQuery);
 
 class SimpleForm extends React.Component<Props> { // eslint-disable-line
   render() {
@@ -23,6 +29,7 @@ class SimpleForm extends React.Component<Props> { // eslint-disable-line
         <Field name="checked" component="input" type="checkbox" />
         <Field name="text" component="input" type="text" />
         <button type="submit">Submit</button>
+        <CurrentQuery />
       </form>
     );
   }

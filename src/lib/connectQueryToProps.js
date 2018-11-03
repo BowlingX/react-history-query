@@ -66,8 +66,8 @@ const connectQueryToProps =
   }
       const WithQueryManager = (props: Object) => (
         <QueryManagerContext.Consumer>
-          {queryManager => (
-            <ConnectQueryHoc queryManager={queryManager} {...props} />
+          {queryManagerContext => (
+            queryManagerContext && <ConnectQueryHoc queryManager={queryManagerContext.queryManager} {...props} />
       )}
         </QueryManagerContext.Consumer>
   );
