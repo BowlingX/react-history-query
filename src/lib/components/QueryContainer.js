@@ -2,7 +2,7 @@
  *@flow
  */
 
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import type { Node, Context } from 'react';
 import queryString from 'query-string';
 import { createSelector } from 'reselect';
@@ -29,7 +29,11 @@ export const QueryManagerContext: Context<?QueryManager> = React.createContext()
 
 const DEFAULT_NAMESPACE = '__d';
 
-export default class QueryContainer extends Component<QueryContainerProps> {
+type State = {
+  persistedComponents: Object
+}
+
+export default class QueryContainer extends PureComponent<QueryContainerProps, State> {
   listener: ?Function;
 
   components: Object = {};
@@ -82,6 +86,8 @@ export default class QueryContainer extends Component<QueryContainerProps> {
           return initial;
         }, {});
         this.components[cmp] = { ...this.components[cmp], state: nextState, serialized };
+        const persistedComponents = this.state.persistedComponents
+        this.setState({ persistedComponents: { ...persistedComponents, [cmp]: serialized } });
       });
       this.props.history.replace({
         ...this.props.history.location,
@@ -228,6 +234,11 @@ export default class QueryContainer extends Component<QueryContainerProps> {
           ...this.props.history.location,
           state: { ...this.props.history.location.state, __componentState: this.currentComponentState() }
         });
+
+        const persistedComponents = this.state.persistedComponents;
+
+        this.setState({ persistedComponents: { ...persistedComponents, [namespace]: serialized } });
+
         return state;
       },
         /* will replace the blank state with the current state */
