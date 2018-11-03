@@ -36,7 +36,7 @@ export const DEFAULT_NAMESPACE = '__d';
 
 export const createQueryString = (components: Object, ...namespaces: Array<?string>) => {
   return namespaces.filter(n => components[n]).map((key) => {
-    return queryString.stringify(components[key || DEFAULT_NAMESPACE].serialized);
+    return queryString.stringify(components[key || DEFAULT_NAMESPACE]);
   }).filter(s => s && s.length > 0).join('&');
 };
 
@@ -277,7 +277,7 @@ export default class QueryContainer extends PureComponent<QueryContainerProps, S
       },
         /* generates the query string for the given namespace(s) */
       createQueryString: (...namespaces: Array<string>) => {
-        return createQueryString(this.components, ...namespaces);
+        return createQueryString(this.state.persistedComponents, ...namespaces);
       },
       unregister: (namespace?:string = DEFAULT_NAMESPACE) => {
         this.namespaceGc[namespace] -= 1;
