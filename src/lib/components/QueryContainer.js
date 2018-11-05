@@ -123,8 +123,17 @@ export default class QueryContainer extends PureComponent<QueryContainerProps, S
             // mutate current state with old value,
             // this way we can only call fromHistory where required
             this.components[key].state[propKey] = oldValue;
-            this.components[key].serialized = { ...this.components[key].serialized,
-              ...(this.components[key].optionsSelector({ key: propKey, value: oldValue }, propKey)) };
+            // mutate current serialized value
+            const nextPropValue = this.components[key].optionsSelector({ key: propKey, value: oldValue }, propKey);
+            const nsKey = QueryContainer.formatNamespace(key, propKey);
+            if (!nextPropValue[nsKey]) { // if value was empty we remove the current value
+              delete this.components[key].serialized[nsKey];
+            } else {
+              this.components[key].serialized = {
+                ...this.components[key].serialized,
+                ...nextPropValue
+              };
+            }
           }
         });
       }
@@ -219,9 +228,16 @@ export default class QueryContainer extends PureComponent<QueryContainerProps, S
       updateProps: (namespace: string = DEFAULT_NAMESPACE, props:Object) => {
         this.components[namespace] = { ...this.components[namespace], props };
       },
+      registerMount: (namespace: string = DEFAULT_NAMESPACE) => {
+        if (this.namespaceGc[namespace]) {
+          this.namespaceGc[namespace] += 1;
+        } else {
+          this.namespaceGc[namespace] = 1;
+        }
+      },
       register: (namespace: string = DEFAULT_NAMESPACE, options: Object, props: Object) => {
         if (this.components[namespace]) {
-          this.namespaceGc[namespace] += 1;
+          return this.components[namespace].state;
         }
         const keySelector = state => state.key;
         const valueSelector = state => state.value;
@@ -255,9 +271,6 @@ export default class QueryContainer extends PureComponent<QueryContainerProps, S
         this.components[namespace] = {
           options, props, optionsSelector, blankState, state: initialState, serialized
         };
-        if (!this.namespaceGc[namespace]) {
-          this.namespaceGc[namespace] = 1;
-        }
         this.props.history.replace({
           ...this.props.history.location,
           state: { ...this.props.history.location.state, __componentState: this.currentComponentState() }
