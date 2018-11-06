@@ -275,7 +275,7 @@ export default class QueryContainer extends PureComponent<QueryContainerProps, S
 
         this.updateState(namespace, serialized);
 
-        return state;
+        return { state, serialized };
       },
         /* will replace the blank state with the current state */
       persistCurrentState: (namespace?: string = DEFAULT_NAMESPACE): boolean => {
