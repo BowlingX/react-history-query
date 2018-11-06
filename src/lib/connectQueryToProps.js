@@ -21,15 +21,9 @@ const connectQueryToProps =
 
         innerComponentRef: ?Element;
 
-        state = {}
-
-        constructor(props:*) {
-          super(props);
-          this.state = this.props.queryManager.register(namespace, options, props);
-        }
-
         componentWillMount() {
-          this.props.queryManager.registerMount(namespace);
+          const state = this.props.queryManager.register(namespace, options, this.props);
+          this.setState(state);
         }
 
         shouldComponentUpdate(nextProps: Object, nextState: Object) {

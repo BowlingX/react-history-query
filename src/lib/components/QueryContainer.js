@@ -228,16 +228,9 @@ export default class QueryContainer extends PureComponent<QueryContainerProps, S
       updateProps: (namespace: string = DEFAULT_NAMESPACE, props:Object) => {
         this.components[namespace] = { ...this.components[namespace], props };
       },
-      registerMount: (namespace: string = DEFAULT_NAMESPACE) => {
-        if (this.namespaceGc[namespace]) {
-          this.namespaceGc[namespace] += 1;
-        } else {
-          this.namespaceGc[namespace] = 1;
-        }
-      },
       register: (namespace: string = DEFAULT_NAMESPACE, options: Object, props: Object) => {
         if (this.components[namespace]) {
-          return this.components[namespace].state;
+          this.namespaceGc[namespace] += 1;
         }
         const keySelector = state => state.key;
         const valueSelector = state => state.value;
@@ -271,6 +264,10 @@ export default class QueryContainer extends PureComponent<QueryContainerProps, S
         this.components[namespace] = {
           options, props, optionsSelector, blankState, state: initialState, serialized
         };
+        if (!this.namespaceGc[namespace]) {
+          this.namespaceGc[namespace] = 1;
+        }
+
         this.props.history.replace({
           ...this.props.history.location,
           state: { ...this.props.history.location.state, __componentState: this.currentComponentState() }
@@ -322,7 +319,7 @@ export default class QueryContainer extends PureComponent<QueryContainerProps, S
   }
 
   render() {
-    const children = React.Children.only(this.props.children);
+    const { children } = this.props;
     const { persistedComponents } = this.state;
     return (
       <QueryManagerContext.Provider value={{ queryManager: this.queryManager, queries: persistedComponents }}>
