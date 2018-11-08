@@ -17,12 +17,12 @@ const connectQuery =
       render() {
         return (
           <QueryManagerContext.Consumer>
-            {(queryManagerContext: QueryManagerContextType) => {
+            {(queryManagerContext: ?QueryManagerContextType) => {
               const additionalProps = makeRefAvailable ?
               { ref: (instance) => { this.innerComponentRef = instance; } } : {};
               return (
                 <QueryContext.Consumer>
-                  {queries => (
+                  {queries => queryManagerContext && (
                     //  $FlowFixMe: ignore
                     <InnerComponent
                       queries={queries}
