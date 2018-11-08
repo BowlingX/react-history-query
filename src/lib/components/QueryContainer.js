@@ -29,7 +29,9 @@ export type QueryManagerContextType = {
   queries: Object
 }
 
-export const QueryManagerContext: Context<?QueryManagerContextType> = React.createContext();
+// $FlowFixMe: ignore
+export const QueryManagerContext: Context<QueryManagerContextType> =
+  React.createContext({ });
 
 
 export const DEFAULT_NAMESPACE = '__d';
