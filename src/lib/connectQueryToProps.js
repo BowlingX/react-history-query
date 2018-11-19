@@ -38,6 +38,10 @@ const connectQueryToProps =
           if (this.props.queryManager.isTransitioning()) {
             return;
           }
+
+          if (typeof this.props.skip === 'function' && this.props.skip(prevState.state, this.state.state)) {
+            return;
+          }
         // check if the parameters actually changed:
           if (!shallowEqual(
           getOptionsFromProps(options, prevState.state),
