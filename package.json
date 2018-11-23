@@ -14,7 +14,7 @@
     "build:es": "cross-env BABEL_ENV=es babel src/lib --out-dir dist/es6",
     "build:commonjs": "cross-env BABEL_ENV=commonjs babel src/lib --out-dir dist/commonjs",
     "cleanProject": "rimraf dist test_out",
-    "build:flow": "flow-copy-source -v src/lib dist/es6",
+    "build:flow": "flow-copy-source -v src/lib dist/commonjs",
     "prepublishOnly": "npm run cleanProject && npm run build:flow && npm run build:es && npm run build:commonjs",
     "semantic-release": "semantic-release"
   },
