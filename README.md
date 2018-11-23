@@ -126,6 +126,12 @@ Be careful what you do here, because it might break the state handling
 
 Tested and working fine. Instead of `createBrowserHistory` use `createMemoryHistory` from the `history` package.
 
+## Skip update cycle
+
+You can pass a `skip` prop to `connectQueryToProps` and decide to skip a push completely on any update of props. 
+
+    skip => (prevState: Object, nextState: Object): boolean
+
 ## Third party libraries
 
 ### react-router

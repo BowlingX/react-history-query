@@ -31,7 +31,6 @@ export type QueryManagerContextType = {
 
 export const QueryManagerContext: Context<?QueryManagerContextType> = React.createContext();
 
-
 export const DEFAULT_NAMESPACE = '__d';
 
 export const createQueryString = (components: Object, ...namespaces: Array<?string>) => {
