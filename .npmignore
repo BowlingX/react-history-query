@@ -11,7 +11,7 @@ webpack.config.js
 .eslintrc
 *.iml
 .idea
-src/demo
 test_out
 reports
 package-lock.json
+src
