@@ -9,7 +9,6 @@ flow-typed
 .flow/lib
 
 [options]
-module.name_mapper='^\(actions\|components\|containers\|modules\|validators\|helpers\|util\|pages\|options\|selectors\)\(\/?.*\)$' -> '<PROJECT_ROOT>/src/AppBundle/Resources/js/\1/\2'
 module.name_mapper.extension='scss' -> '<PROJECT_ROOT>/.flow/CSSModules.js.flow'
 module.name_mapper.extension='jpg' -> '<PROJECT_ROOT>/.flow/ImageModules.js.flow'
 module.name_mapper.extension='png' -> '<PROJECT_ROOT>/.flow/ImageModules.js.flow'
