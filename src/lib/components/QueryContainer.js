@@ -244,7 +244,7 @@ export default class QueryContainer extends PureComponent<QueryContainerProps, S
         const initialState = {};
           // serialized query parameter state
         const serialized = {};
-        const state = Object.keys(options).reduce((initial, key) => {
+        const state = Object.keys(options).reduce((initial: Object, key: string) => {
           const initialQueryValue = this.initialParsedQuery(this.props.history.location)[
             QueryContainer.formatNamespace(namespace, key)
             ];
