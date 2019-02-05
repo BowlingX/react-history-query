@@ -43,6 +43,17 @@ type State = {
   persistedComponents: Object
 }
 
+const keySelector = state => state.key;
+const valueSelector = state => state.value;
+const propsSelector = state => state.props;
+
+const createOptionsSelector = (options: Object, namespace: string) => createCachedSelector(
+  keySelector, valueSelector, propsSelector, (key, value, thisProps) => {
+    return !(options[key].skip && options[key].skip(value, thisProps)) ? {
+      [QueryContainer.formatNamespace(namespace, key)]: options[key].toQueryString(value)
+    } : {};
+  })((state, key) => key);
+
 export default class QueryContainer extends PureComponent<QueryContainerProps, State> {
   listener: ?Function;
 
@@ -123,7 +134,8 @@ export default class QueryContainer extends PureComponent<QueryContainerProps, S
             // this way we can only call fromHistory where required
             this.components[key].state[propKey] = oldValue;
             // mutate current serialized value
-            const nextPropValue = this.components[key].optionsSelector({ key: propKey, value: oldValue }, propKey);
+            const nextPropValue = this.components[key].optionsSelector(
+              { key: propKey, value: oldValue, props: this.components[key].props }, propKey);
             const nsKey = QueryContainer.formatNamespace(key, propKey);
             if (!nextPropValue[nsKey]) { // if value was empty we remove the current value
               delete this.components[key].serialized[nsKey];
@@ -203,7 +215,7 @@ export default class QueryContainer extends PureComponent<QueryContainerProps, S
         const next = Object.keys(options).reduce((initial, key) => {
           const value = props[key];
           if (value !== undefined) {
-            const nextValue = optionsSelector({ key, value }, key);
+            const nextValue = optionsSelector({ key, value, props }, key);
             return {
               state: { ...initial.state, [key]: value },
               serialized: {
@@ -231,14 +243,8 @@ export default class QueryContainer extends PureComponent<QueryContainerProps, S
         if (this.components[namespace]) {
           this.namespaceGc[namespace] += 1;
         }
-        const keySelector = state => state.key;
-        const valueSelector = state => state.value;
-        const optionsSelector = createCachedSelector(keySelector, valueSelector, (key, value) => {
-          return !(options[key].skip && options[key].skip(value, props)) ? {
-            [QueryContainer.formatNamespace(namespace, key)]: options[key].toQueryString(value)
-          } : {};
-        })((state, key) => key);
-          // blank state = state without query parameters applied
+        const optionsSelector = createOptionsSelector(options, namespace);
+        // blank state = state without query parameters applied
         const blankState = {};
           // initial state = state with queryParameters applied (or not if not set)
         const initialState = {};
