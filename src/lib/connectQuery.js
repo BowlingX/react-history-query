@@ -2,16 +2,15 @@
  * @flow
  */
 
-import React, { PureComponent } from 'react';
-import type { ComponentType } from 'react';
-import { QueryManagerContext } from './components/QueryContainer';
-import type { QueryManagerContextType } from "./components/QueryContainer";
-import { QueryContext } from "./connectQueryToProps";
+import React, { PureComponent } from 'react'
+import type { ComponentType } from 'react'
+import { QueryManagerContext } from './components/QueryContainer'
+import type { QueryManagerContextType } from './components/QueryContainer'
+import { QueryContext } from './connectQueryToProps'
 
 const connectQuery =
   (makeRefAvailable: boolean = false) => (InnerComponent: ComponentType<*>) => {
     return class extends PureComponent<*, *> {
-
       innerComponentRef: ?Element;
 
       render() {
@@ -19,7 +18,7 @@ const connectQuery =
           <QueryManagerContext.Consumer>
             {(queryManagerContext: ?QueryManagerContextType) => {
               const additionalProps = makeRefAvailable ?
-              { ref: (instance) => { this.innerComponentRef = instance; } } : {};
+                { ref: instance => {this.innerComponentRef = instance} } : {}
               return (
                 <QueryContext.Consumer>
                   {queries => queryManagerContext && (
@@ -34,12 +33,12 @@ const connectQuery =
                     />
                   )}
                 </QueryContext.Consumer>
-              );
+              )
             }}
           </QueryManagerContext.Consumer>
-        );
+        )
       }
-    };
-  };
+    }
+  }
 
-export default connectQuery;
+export default connectQuery

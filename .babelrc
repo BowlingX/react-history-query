@@ -1,58 +1,31 @@
 {
   "presets": [
-    "react",
-    ["env", {
+    "@babel/react",
+    ["@babel/env", {
       "modules": false
     }]
   ],
   "plugins": [
-    "syntax-dynamic-import",
-    "syntax-async-functions",
-    "transform-class-properties",
-    "transform-flow-strip-types",
-    "transform-object-rest-spread",
-    "transform-regenerator",
-    "transform-runtime",
-    "transform-proto-to-assign",
-    "syntax-export-extensions"
+    "@babel/plugin-proposal-export-default-from",
+    "@babel/plugin-transform-flow-strip-types",
+    "@babel/plugin-transform-runtime",
+    "@babel/plugin-proposal-class-properties",
+    "@babel/plugin-syntax-export-extensions"
   ],
   "env": {
     "test": {
       "presets": [
-        "react", "env"
-      ],
-      "plugins": [
-        "syntax-dynamic-import",
-        "syntax-async-functions",
-        "transform-class-properties",
-        "transform-flow-strip-types",
-        "transform-object-rest-spread",
-        "transform-regenerator",
-        "transform-runtime",
-        "transform-proto-to-assign",
-        "syntax-export-extensions"
+        "@babel/react", "@babel/env"
       ]
     },
     "commonjs": {
       "presets": [
-        "react",
-        ["env", {
+        "@babel/react",
+        ["@babel/env", {
           "targets": {
             "browsers": ["last 2 versions", "safari >= 7"]
           }
         }]
-      ],
-      "plugins": [
-        ["transform-es2015-modules-commonjs", { "loose": true }],
-        "syntax-dynamic-import",
-        "syntax-async-functions",
-        "transform-class-properties",
-        "transform-flow-strip-types",
-        "transform-object-rest-spread",
-        "transform-regenerator",
-        "transform-runtime",
-        "transform-proto-to-assign",
-        "syntax-export-extensions"
       ]
     }
   }

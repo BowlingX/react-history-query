@@ -8,15 +8,6 @@ module.exports = {
         test: /\.jsx?$/,
         exclude: /node_modules/,
         loader: 'babel-loader'
-      },
-      {
-        test: /\.scss$/,
-        loaders: [
-          "style-loader",
-          "css-loader?localIdentName=[name]__[local]_[hash:base64:4]",
-          "sass-loader"
-        ],
-        include: path.resolve(__dirname, '../')
       }
     ]
   },

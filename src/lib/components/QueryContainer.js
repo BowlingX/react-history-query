@@ -2,12 +2,12 @@
  *@flow
  */
 
-import React, { PureComponent } from 'react';
-import type { Node, Context } from 'react';
-import queryString from 'query-string';
-import { createSelector } from 'reselect';
-import createCachedSelector from 're-reselect';
-import shallowEqual from 'shallowequal';
+import React, { PureComponent } from 'react'
+import type { Node, Context } from 'react'
+import queryString from 'query-string'
+import { createSelector } from 'reselect'
+import createCachedSelector from 're-reselect'
+import shallowEqual from 'shallowequal'
 
 type QueryContainerProps = {
   history: Object,
@@ -29,37 +29,37 @@ export type QueryManagerContextType = {
   queries: Object
 }
 
-export const QueryManagerContext: Context<?QueryManagerContextType> = React.createContext();
+export const QueryManagerContext: Context<?QueryManagerContextType> = React.createContext()
 
-export const DEFAULT_NAMESPACE = '__d';
+export const DEFAULT_NAMESPACE = '__d'
 
 export const createQueryString = (components: Object, ...namespaces: Array<?string>) => {
-  return namespaces.filter(n => components[n]).map((key) => {
-    return queryString.stringify(components[key || DEFAULT_NAMESPACE]);
-  }).filter(s => s && s.length > 0).join('&');
-};
+  return namespaces.filter(n => components[n]).map(key => {
+    return queryString.stringify(components[key || DEFAULT_NAMESPACE])
+  }).filter(s => s && s.length > 0).join('&')
+}
 
 type State = {
   persistedComponents: Object
 }
 
-const keySelector = state => state.key;
-const valueSelector = state => state.value;
-const propsSelector = state => state.props;
+const keySelector = state => state.key
+const valueSelector = state => state.value
+const propsSelector = state => state.props
 
 const createOptionsSelector = (options: Object, namespace: string) => createCachedSelector(
   keySelector, valueSelector, propsSelector, (key, value, thisProps) => {
     return !(options[key].skip && options[key].skip(value, thisProps)) ? {
       [QueryContainer.formatNamespace(namespace, key)]: options[key].toQueryString(value)
-    } : {};
-  })((state, key) => key);
+    } : {}
+  })((state, key) => key)
 
 export default class QueryContainer extends PureComponent<QueryContainerProps, State> {
   listener: ?Function;
 
   components: Object = {};
 
-  initialParsedQuery: (location:Object) => Object;
+  initialParsedQuery: (location: Object) => Object;
 
   isTransitioning: boolean = false;
 
@@ -72,86 +72,86 @@ export default class QueryContainer extends PureComponent<QueryContainerProps, S
   }
 
   constructor(props: QueryContainerProps) {
-    super(props);
-    const searchSelector = location => location.search;
+    super(props)
+    const searchSelector = location => location.search
     this.initialParsedQuery =
-    createSelector(searchSelector, search => queryString.parse(search));
-    this.queryManager = this.initQueryManager();
+    createSelector(searchSelector, search => queryString.parse(search))
+    this.queryManager = this.initQueryManager()
   }
 
-  static formatNamespace(ns:?string, key:string) {
-    return ns && ns !== DEFAULT_NAMESPACE ? `${ns}.${key}` : key;
+  static formatNamespace(ns: ?string, key: string) {
+    return ns && ns !== DEFAULT_NAMESPACE ? `${ns}.${key}` : key
   }
 
-  /**
+  /*
    * Handles external push events
    */
-  handlePush(previousState:Object) {
-    this.isTransitioning = true;
-    const parsedQuery = this.initialParsedQuery(this.props.history.location);
+  handlePush(previousState: Object) {
+    this.isTransitioning = true
+    const parsedQuery = this.initialParsedQuery(this.props.history.location)
     // we skip one cycle to support proper handling of route switches / prop updates in fromHistory
     requestAnimationFrame(() => {
-      Object.keys(this.components).forEach((cmp) => {
-        const { blankState, options, props, state } = this.components[cmp];
-        const serialized = {};
+      Object.keys(this.components).forEach(cmp => {
+        const { blankState, options, props, state } = this.components[cmp]
+        const serialized = {}
         const nextState = Object.keys(options).reduce((initial, optionKey) => {
-          const queryValue = parsedQuery[QueryContainer.formatNamespace(cmp, optionKey)];
-          const blankStateValue = blankState[optionKey];
-          let newState = blankStateValue;
+          const queryValue = parsedQuery[QueryContainer.formatNamespace(cmp, optionKey)]
+          const blankStateValue = blankState[optionKey]
+          let newState = blankStateValue
           if (queryValue !== undefined) {
-            newState = options[optionKey].fromQueryString(queryValue, props);
-            serialized[QueryContainer.formatNamespace(cmp, optionKey)] = queryValue;
+            newState = options[optionKey].fromQueryString(queryValue, props)
+            serialized[QueryContainer.formatNamespace(cmp, optionKey)] = queryValue
           } else if (blankStateValue !== undefined) {
-            const oldValue = state[optionKey];
+            const oldValue = state[optionKey]
             if (!shallowEqual(oldValue, blankStateValue)) {
-              options[optionKey].fromHistory(blankStateValue, props);
+              options[optionKey].fromHistory(blankStateValue, props)
             }
           }
-          initial[optionKey] = newState;
-          return initial;
-        }, {});
-        this.components[cmp] = { ...this.components[cmp], state: nextState, serialized };
-      });
+          initial[optionKey] = newState
+          return initial
+        }, {})
+        this.components[cmp] = { ...this.components[cmp], state: nextState, serialized }
+      })
       this.props.history.replace({
         ...this.props.history.location,
         state: { ...previousState, __componentState: this.currentComponentState() }
-      });
-      this.refreshState();
-      this.isTransitioning = false;
-    });
+      })
+      this.refreshState()
+      this.isTransitioning = false
+    })
   }
 
-  handlePop(previousState:Object) {
-    this.isTransitioning = true;
-    Object.keys(previousState).forEach((key) => {
+  handlePop(previousState: Object) {
+    this.isTransitioning = true
+    Object.keys(previousState).forEach(key => {
       if (this.components[key]) {
-        Object.keys(previousState[key]).forEach((propKey) => {
-          const oldValue = previousState[key][propKey];
+        Object.keys(previousState[key]).forEach(propKey => {
+          const oldValue = previousState[key][propKey]
           if (oldValue === undefined || (!shallowEqual(oldValue, this.components[key].state[propKey]))) {
             this.components[key].options[propKey].fromHistory(
-              oldValue, this.components[key].props);
+              oldValue, this.components[key].props)
             // mutate current state with old value,
             // this way we can only call fromHistory where required
-            this.components[key].state[propKey] = oldValue;
+            this.components[key].state[propKey] = oldValue
             // mutate current serialized value
             const nextPropValue = this.components[key].optionsSelector(
-              { key: propKey, value: oldValue, props: this.components[key].props }, propKey);
-            const nsKey = QueryContainer.formatNamespace(key, propKey);
+              { key: propKey, value: oldValue, props: this.components[key].props }, propKey)
+            const nsKey = QueryContainer.formatNamespace(key, propKey)
             if (!nextPropValue[nsKey]) { // if value was empty we remove the current value
-              delete this.components[key].serialized[nsKey];
+              delete this.components[key].serialized[nsKey]
             } else {
               this.components[key].serialized = {
                 ...this.components[key].serialized,
                 ...nextPropValue
-              };
+              }
             }
           }
-        });
+        })
       }
-    });
+    })
     // recalculate serialized state
-    this.refreshState();
-    this.isTransitioning = false;
+    this.refreshState()
+    this.isTransitioning = false
   }
 
   refreshState() {
@@ -159,177 +159,177 @@ export default class QueryContainer extends PureComponent<QueryContainerProps, S
       return {
         ...previous,
         [next]: this.components[next].serialized
-      };
-    }, {}) });
+      }
+    }, {}) })
   }
 
   componentDidMount() {
-    const { history } = this.props;
+    const { history } = this.props
     // save initial state
     history.replace(
       { ...history.location,
         state: { ...history.location.state, __componentState: this.currentComponentState(), isInitial: true }
       }
-      );
+    )
     this.listener = history.listen((location, action) => {
-      const historyState = location.state && location.state.__componentState;
+      const historyState = location.state && location.state.__componentState
       // react to external events
       if (action === 'PUSH' && !historyState) {
-        this.handlePush(location.state);
-        return;
+        this.handlePush(location.state)
+        return
       }
       const previousState = historyState ?
-        location.state.__componentState : this.blankComponentState();
+        location.state.__componentState : this.blankComponentState()
       if (action !== 'POP' || !previousState) {
-        return;
+        return
       }
-      this.handlePop(previousState);
-    });
+      this.handlePop(previousState)
+    })
   }
 
   currentComponentState() {
     return Object.keys(this.components).reduce((initial, key) => ({
       ...initial,
       [key]: this.components[key].state
-    }), {});
+    }), {})
   }
 
   blankComponentState() {
     return Object.keys(this.components).reduce((initial, key) => ({
       ...initial,
       [key]: this.components[key].blankState
-    }), {});
+    }), {})
   }
 
   calculateQueryString() {
-    return Object.keys(this.components).map((key) => {
-      return queryString.stringify(this.components[key].serialized);
-    }).filter(s => s && s.length > 0).join('&');
+    return Object.keys(this.components).map(key => {
+      return queryString.stringify(this.components[key].serialized)
+    }).filter(s => s && s.length > 0).join('&')
   }
 
   initQueryManager(): QueryManager {
     return {
       pushChanges: (namespace: string = DEFAULT_NAMESPACE, props: Object) => {
-        const options = this.components[namespace].options;
-        const optionsSelector = this.components[namespace].optionsSelector;
+        const options = this.components[namespace].options
+        const optionsSelector = this.components[namespace].optionsSelector
         const next = Object.keys(options).reduce((initial, key) => {
-          const value = props[key];
+          const value = props[key]
           if (value !== undefined) {
-            const nextValue = optionsSelector({ key, value, props }, key);
+            const nextValue = optionsSelector({ key, value, props }, key)
             return {
               state: { ...initial.state, [key]: value },
               serialized: {
                 ...initial.serialized,
                 ...nextValue
               }
-            };
+            }
           }
-          return initial;
+          return initial
         }, {
           state: {},
           serialized: {}
-        });
-        this.components[namespace] = { ...this.components[namespace], ...next };
+        })
+        this.components[namespace] = { ...this.components[namespace], ...next }
         this.props.history.push(
-            { pathname: location.pathname, search: this.calculateQueryString() },
-            { __componentState: this.currentComponentState() }
-          );
-        this.updateState(namespace, next.serialized);
+          { pathname: location.pathname, search: this.calculateQueryString() },
+          { __componentState: this.currentComponentState() }
+        )
+        this.updateState(namespace, next.serialized)
       },
-      updateProps: (namespace: string = DEFAULT_NAMESPACE, props:Object) => {
-        this.components[namespace] = { ...this.components[namespace], props };
+      updateProps: (namespace: string = DEFAULT_NAMESPACE, props: Object) => {
+        this.components[namespace] = { ...this.components[namespace], props }
       },
       register: (namespace: string = DEFAULT_NAMESPACE, options: Object, props: Object) => {
         if (this.components[namespace]) {
-          this.namespaceGc[namespace] += 1;
+          this.namespaceGc[namespace] += 1
         }
-        const optionsSelector = createOptionsSelector(options, namespace);
+        const optionsSelector = createOptionsSelector(options, namespace)
         // blank state = state without query parameters applied
-        const blankState = {};
-          // initial state = state with queryParameters applied (or not if not set)
-        const initialState = {};
-          // serialized query parameter state
-        const serialized = {};
+        const blankState = {}
+        // initial state = state with queryParameters applied (or not if not set)
+        const initialState = {}
+        // serialized query parameter state
+        const serialized = {}
         const state = Object.keys(options).reduce((initial: Object, key: string) => {
           const initialQueryValue = this.initialParsedQuery(this.props.history.location)[
             QueryContainer.formatNamespace(namespace, key)
-            ];
+          ]
           if (props[key] !== undefined) {
-            blankState[key] = props[key];
-            initialState[key] = props[key];
+            blankState[key] = props[key]
+            initialState[key] = props[key]
           }
           if (initialQueryValue !== undefined) {
-            const value = options[key].fromQueryString(initialQueryValue, props);
-            initialState[key] = value;
-            serialized[QueryContainer.formatNamespace(namespace, key)] = initialQueryValue;
-            return { ...initial, [key]: value };
+            const value = options[key].fromQueryString(initialQueryValue, props)
+            initialState[key] = value
+            serialized[QueryContainer.formatNamespace(namespace, key)] = initialQueryValue
+            return { ...initial, [key]: value }
           }
-          return initial;
-        }, props);
+          return initial
+        }, props)
         this.components[namespace] = {
           options, props, optionsSelector, blankState, state: initialState, serialized
-        };
+        }
         if (!this.namespaceGc[namespace]) {
-          this.namespaceGc[namespace] = 1;
+          this.namespaceGc[namespace] = 1
         }
 
         this.props.history.replace({
           ...this.props.history.location,
           state: { ...this.props.history.location.state, __componentState: this.currentComponentState() }
-        });
+        })
 
-        this.updateState(namespace, serialized);
+        this.updateState(namespace, serialized)
 
-        return { state, serialized };
+        return { state, serialized }
       },
-        /* will replace the blank state with the current state */
+      /* will replace the blank state with the current state */
       persistCurrentState: (namespace?: string = DEFAULT_NAMESPACE): boolean => {
         if (!this.components[namespace]) {
-          return false;
+          return false
         }
-        this.components[namespace].blankState = this.components[namespace].state;
-        return true;
+        this.components[namespace].blankState = this.components[namespace].state
+        return true
       },
-        /* generates the query string for the given namespace(s) */
+      /* generates the query string for the given namespace(s) */
       createQueryString: (...namespaces: Array<string>) => {
-        return createQueryString(this.state.persistedComponents, ...namespaces);
+        return createQueryString(this.state.persistedComponents, ...namespaces)
       },
-      unregister: (namespace?:string = DEFAULT_NAMESPACE) => {
-        this.namespaceGc[namespace] -= 1;
+      unregister: (namespace?: string = DEFAULT_NAMESPACE) => {
+        this.namespaceGc[namespace] -= 1
         if (this.namespaceGc[namespace] === 0) {
           if (this.components[namespace] !== undefined) {
-            this.components[namespace].optionsSelector.clearCache();
-            delete this.components[namespace];
+            this.components[namespace].optionsSelector.clearCache()
+            delete this.components[namespace]
           }
-          delete this.namespaceGc[namespace];
+          delete this.namespaceGc[namespace]
         }
-        const { [namespace]: value, ...rest } = this.state.persistedComponents;
-        this.setState({ persistedComponents: rest });
+        const { [namespace]: value, ...rest } = this.state.persistedComponents // eslint-disable-line
+        this.setState({ persistedComponents: rest })
       },
       isTransitioning: () => this.isTransitioning
-    };
+    }
   }
 
   updateState(ns: string, serialized: Object) {
-    const persistedComponents = this.state.persistedComponents;
-    this.setState({ persistedComponents: { ...persistedComponents, [ns]: serialized } });
+    const persistedComponents = this.state.persistedComponents
+    this.setState({ persistedComponents: { ...persistedComponents, [ns]: serialized } })
   }
 
   componentWillUnmount() {
     if (this.listener) {
-      this.listener();
+      this.listener()
     }
-    this.components = {};
-    this.isTransitioning = false;
+    this.components = {}
+    this.isTransitioning = false
   }
 
   render() {
-    const { children } = this.props;
-    const { persistedComponents } = this.state;
+    const { children } = this.props
+    const { persistedComponents } = this.state
     return (
       <QueryManagerContext.Provider value={{ queryManager: this.queryManager, queries: persistedComponents }}>
         {children}
       </QueryManagerContext.Provider>
-    );
+    )
   }
 }

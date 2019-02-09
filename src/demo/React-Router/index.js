@@ -1,12 +1,12 @@
 /**
  * @flow
  */
-import * as React from 'react';
-import { Router, Link, Route } from 'react-router-dom';
-import Root, { history } from '../shared/Root';
-import { formCreator } from '../Redux-Form/index';
+import * as React from 'react'
+import { Router, Link, Route } from 'react-router-dom'
+import Root, { history } from '../shared/Root'
+import { formCreator } from '../Redux-Form/index'
 
-const Form1 = formCreator('form1', null);
+const Form1 = formCreator('form1', null)
 
 const FirstRoute = () => {
   return (
@@ -15,9 +15,9 @@ const FirstRoute = () => {
       <Link to="/second">Go to second</Link>
       <Form1 />
     </div>
-  );
-};
-const Form2 = formCreator('form2', 'form2');
+  )
+}
+const Form2 = formCreator('form2', 'form2')
 
 const SecondRoute = () => {
   return (
@@ -28,8 +28,8 @@ const SecondRoute = () => {
       <Link to='/second?form2.p.checked=true&form2.p.text="initialText"'>Set some defaults</Link>
       <Form2 />
     </div>
-  );
-};
+  )
+}
 
 const ReactRouter = () => {
   return (
@@ -43,7 +43,7 @@ const ReactRouter = () => {
         </div>
       </Router>
     </Root>
-  );
-};
+  )
+}
 
-export default ReactRouter;
+export default ReactRouter
