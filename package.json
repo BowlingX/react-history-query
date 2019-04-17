@@ -2,8 +2,8 @@
   "name": "react-history-query",
   "version": "0.0.0-development",
   "description": "a higher order component to connect the history with component props",
-  "main": "./dist/commonjs/index.js",
-  "module": "./dist/es6/index.js",
+  "main": "./dist/index.js",
+  "module": "./dist/index.es6.js",
   "scripts": {
     "lint": "flow check && eslint src/",
     "start": "styleguidist server",
@@ -11,11 +11,11 @@
     "styleguide:build": "styleguidist build",
     "test": "cross-env BABEL_ENV=test karma start --single-run --ci --test",
     "tdd": "cross-env BABEL_ENV=test karma start --auto-watch --test",
-    "build:es": "cross-env BABEL_ENV=es babel src/lib --out-dir dist/es6",
-    "build:commonjs": "cross-env BABEL_ENV=commonjs babel src/lib --out-dir dist/commonjs",
+    "build:es": "cross-env BABEL_ENV=es babel src/lib --ignore \"**/__examples__/**/*.js,**/__tests__/**/*.js\" --out-dir dist && renamer --find \".js\" --replace \".es6.js\" \"./dist/**\"",
+    "build:commonjs": "cross-env BABEL_ENV=commonjs babel --ignore \"**/__examples__/**/*.js,**/__tests__/**/*.js\" src/lib --out-dir dist",
     "cleanProject": "rimraf dist test_out",
-    "build:flow": "flow-copy-source -v src/lib dist/commonjs",
-    "prepublishOnly": "npm run cleanProject && npm run build:flow && npm run build:es && npm run build:commonjs",
+    "build:flow": "flow-copy-source -v src/lib dist --ignore \"**/__examples__/**/*.js\" --ignore \"**/__tests__/**/*.js\"",
+    "prepublishOnly": "npm run cleanProject && npm run build:es && npm run build:flow && npm run build:commonjs",
     "semantic-release": "semantic-release"
   },
   "sideEffects": false,
@@ -42,26 +42,27 @@
     "react": "^15.0.0 || ^16.0.0"
   },
   "dependencies": {
+    "@babel/runtime": "^7.3.1",
     "history": "^4.7.2",
     "query-string": "^5.0.0",
     "re-reselect": "^2.3.0",
     "reselect": "^4.0.0",
-    "shallowequal": "^1.1.0",
-    "@babel/runtime": "^7.3.1"
+    "shallowequal": "^1.1.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.2.3",
     "@babel/core": "^7.2.2",
-    "@babel/register": "^7.0.0",
-    "babel-eslint": "^10.0.1",
-    "babel-loader": "^8.0.5",
+    "@babel/plugin-proposal-class-properties": "^7.3.0",
     "@babel/plugin-proposal-export-default-from": "^7.2.0",
     "@babel/plugin-syntax-dynamic-import": "^7.2.0",
-    "@babel/plugin-proposal-class-properties": "^7.3.0",
     "@babel/plugin-transform-flow-strip-types": "^7.2.3",
     "@babel/plugin-transform-runtime": "^7.2.0",
     "@babel/preset-env": "^7.3.1",
     "@babel/preset-react": "^7.0.0",
+    "@babel/register": "^7.0.0",
+    "babel-eslint": "^10.0.1",
+    "babel-loader": "^8.0.5",
+    "babel-plugin-transform-rename-import": "^2.3.0",
     "cross-env": "^5.0.1",
     "enzyme": "^3.7.0",
     "enzyme-adapter-react-16": "^1.6.0",
@@ -71,6 +72,7 @@
     "eslint-plugin-import": "^2.14.0",
     "eslint-plugin-react": "^7.1.0",
     "flow-bin": "^0.92.1",
+    "flow-copy-source": "^2.0.2",
     "flow-status-webpack-plugin": "^0.1.7",
     "jasmine-core": "^2.6.4",
     "karma": "^1.7.0",
@@ -91,9 +93,9 @@
     "react-test-renderer": "^16.2.0",
     "redux": "^4.0.1",
     "redux-form": "^7.4.2",
+    "renamer": "^1.1.1",
     "rimraf": "^2.6.1",
     "semantic-release": "^15.10.7",
-    "webpack": "^3.3.0",
-    "flow-copy-source": "^2.0.2"
+    "webpack": "^3.3.0"
   }
 }

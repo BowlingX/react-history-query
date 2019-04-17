@@ -12,6 +12,11 @@
     "@babel/plugin-proposal-class-properties"
   ],
   "env": {
+    "es": {
+      "plugins": [
+        ["transform-rename-import", { "original": "^\\.\\/(.+)", "replacement": "./$1.es6" }]
+      ]
+    },
     "test": {
       "presets": [
         "@babel/react", "@babel/env"

@@ -1,5 +1,5 @@
-const path = require('path');
-const FlowStatusWebpackPlugin = require('flow-status-webpack-plugin');
+const path = require('path')
+const FlowStatusWebpackPlugin = require('flow-status-webpack-plugin')
 
 module.exports = {
   module: {
@@ -19,9 +19,9 @@ module.exports = {
     })
   ],
   externals: {
-    cheerio: 'window',
+    'cheerio': 'window',
     'react/addons': true,
     'react/lib/ExecutionEnvironment': true,
     'react/lib/ReactContext': true
   }
-};
+}
