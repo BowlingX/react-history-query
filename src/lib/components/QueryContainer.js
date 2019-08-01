@@ -273,10 +273,14 @@ export default class QueryContainer extends PureComponent<QueryContainerProps, S
           this.namespaceGc[namespace] = 1
         }
 
-        this.props.history.replace({
-          ...this.props.history.location,
-          state: { ...this.props.history.location.state, __componentState: this.currentComponentState() }
-        })
+        // In case the component get's registered during navigation, we don't replace the current history entry
+        // otherwise we would overwrite it with the old state.
+        if (this.props.history.action !== 'POP') {
+          this.props.history.replace({
+            ...this.props.history.location,
+            state: { ...this.props.history.location.state, __componentState: this.currentComponentState() }
+          })
+        }
 
         this.updateState(namespace, serialized)
 
