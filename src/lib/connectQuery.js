@@ -11,9 +11,9 @@ import { QueryContext } from './connectQueryToProps'
 const connectQuery =
   (makeRefAvailable: boolean = false) => (InnerComponent: ComponentType<*>) => {
     return class extends PureComponent<*, *> {
-      innerComponentRef: ?Element;
+      innerComponentRef: ?ComponentType<*>;
 
-      getRef = instance => {
+      getRef = (instance: ?ComponentType<*>) => {
         this.innerComponentRef = instance
       }
 

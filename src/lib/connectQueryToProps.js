@@ -49,7 +49,7 @@ const connectQueryToProps =
       const normalizedNamespace = namespace || DEFAULT_NAMESPACE
 
       class ConnectQueryHoc extends Component<*, *> {
-        innerComponentRef: ?Element;
+        innerComponentRef: ?ComponentType<*>;
 
         componentWillMount() {
           const { state, serialized } = this.props.queryManager.register(namespace, options, this.props)
@@ -92,7 +92,7 @@ const connectQueryToProps =
           return this.innerComponentRef
         }
 
-        calcRef = instance => {
+        calcRef = (instance: ?ComponentType<*>) => {
           this.innerComponentRef = instance
         }
 
