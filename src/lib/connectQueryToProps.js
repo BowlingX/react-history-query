@@ -51,7 +51,8 @@ const connectQueryToProps =
       class ConnectQueryHoc extends Component<*, *> {
         innerComponentRef: ?ComponentType<*>;
 
-        componentWillMount() {
+        // eslint-disable-next-line camelcase
+        UNSAFE_componentWillMount() {
           const { state, serialized } = this.props.queryManager.register(namespace, options, this.props)
           this.setState({ state, serialized })
         }
