@@ -13,12 +13,16 @@ const connectQuery =
     return class extends PureComponent<*, *> {
       innerComponentRef: ?Element;
 
+      getRef = instance => {
+        this.innerComponentRef = instance
+      }
+
       render() {
         return (
           <QueryManagerContext.Consumer>
             {(queryManagerContext: ?QueryManagerContextType) => {
               const additionalProps = makeRefAvailable ?
-                { ref: instance => {this.innerComponentRef = instance} } : {}
+                { ref: this.getRef } : {}
               return (
                 <QueryContext.Consumer>
                   {queries => queryManagerContext && (

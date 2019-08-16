@@ -2,7 +2,7 @@
  * @flow
  */
 
-import React, { Component } from 'react'
+import React, { Component, useContext, useMemo, memo } from 'react'
 import type { ComponentType, Context } from 'react'
 import shallowEqual from 'shallowequal'
 import { DEFAULT_NAMESPACE, QueryManagerContext } from './components/QueryContainer'
@@ -14,6 +14,33 @@ const getOptionsFromProps = (options: Object, props: Object) => {
 }
 
 export const QueryContext: Context<Object> = React.createContext({})
+
+type InnerQueryWrapperProps = {
+  queryData: Object,
+  normalizedNamespace: string,
+  innerState: Object,
+  innerComponent: ComponentType<*>,
+  additionalProps: Object
+}
+
+function InnerQueryWrapper({
+  queryData,
+  normalizedNamespace,
+  innerComponent: InnerComponent,
+  ...rest
+}: InnerQueryWrapperProps) {
+  const queries = useContext(QueryContext)
+  const value = useMemo(() => {
+    return { ...queries, [normalizedNamespace]: queryData }
+  }, [ queries, queryData, normalizedNamespace ])
+  return (
+    <QueryContext.Provider value={value}>
+      <InnerComponent {...rest} />
+    </QueryContext.Provider>
+  )
+}
+
+const MemoizedInnerQueryWrapper = memo(InnerQueryWrapper)
 
 const connectQueryToProps =
   (thisNamespace: ?string, options: Object, makeRefAvailable: boolean = false) =>
@@ -50,7 +77,7 @@ const connectQueryToProps =
           }
         }
 
-      UNSAFE_componentWillReceiveProps(props: Object) { // eslint-disable-line
+        UNSAFE_componentWillReceiveProps(props: Object) { // eslint-disable-line
           this.props.queryManager.updateProps(namespace, props)
           this.setState({ state: props })
         }
@@ -65,18 +92,22 @@ const connectQueryToProps =
           return this.innerComponentRef
         }
 
+        calcRef = instance => {
+          this.innerComponentRef = instance
+        }
+
         render() {
           const additionalProps = makeRefAvailable ?
-            { ref: instance => {this.innerComponentRef = instance} } : {}
+            { ref: this.calcRef } : {}
           const queryData = this.props.queries[normalizedNamespace] || this.state.serialized
           return (
-            <QueryContext.Consumer>
-              {(queries: Object) => (
-                <QueryContext.Provider value={{ ...queries, [normalizedNamespace]: queryData }}>
-                  <InnerComponent {...additionalProps} {...this.state.state} />
-                </QueryContext.Provider>
-              )}
-            </QueryContext.Consumer>
+            <MemoizedInnerQueryWrapper
+              innerComponent={InnerComponent}
+              normalizedNamespace={normalizedNamespace}
+              queryData={queryData}
+              {...additionalProps}
+              {...this.state.state}
+            />
           )
         }
       }

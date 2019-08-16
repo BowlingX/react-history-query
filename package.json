@@ -39,7 +39,7 @@
   },
   "homepage": "https://github.com/BowlingX/react-history-query#readme",
   "peerDependencies": {
-    "react": "^15.0.0 || ^16.0.0"
+    "react": "^16.8"
   },
   "dependencies": {
     "@babel/runtime": "^7.3.1",
