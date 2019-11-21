@@ -2,8 +2,8 @@
 ./src
 
 [ignore]
-.*/node_modules/.*
 .*/dist/.*
+.*/findup/.*
 
 [libs]
 flow-typed
