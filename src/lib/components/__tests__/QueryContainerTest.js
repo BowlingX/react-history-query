@@ -3,14 +3,14 @@
  */
 
 import * as React from 'react'
-import createHistory from 'history/createBrowserHistory'
+import { createBrowserHistory } from 'history'
 import Enzyme, { mount } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 import QueryContainer from '../QueryContainer'
 
 Enzyme.configure({ adapter: new Adapter() })
 
-const history = createHistory()
+const history = createBrowserHistory()
 
 describe('<QueryContainer/>', () => {
   it('should render a connected component', () => {
