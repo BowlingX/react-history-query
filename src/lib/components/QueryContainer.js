@@ -113,9 +113,8 @@ export default class QueryContainer extends PureComponent<QueryContainerProps, S
         this.components[cmp] = { ...this.components[cmp], state: nextState, serialized }
       })
       this.props.history.replace({
-        ...this.props.history.location,
-        state: { ...previousState, __componentState: this.currentComponentState() }
-      })
+        ...this.props.history.location
+      }, { ...previousState, __componentState: this.currentComponentState() })
       this.refreshState()
       this.isTransitioning = false
     })
@@ -167,11 +166,10 @@ export default class QueryContainer extends PureComponent<QueryContainerProps, S
     const { history } = this.props
     // save initial state
     history.replace(
-      { ...history.location,
-        state: { ...history.location.state, __componentState: this.currentComponentState(), isInitial: true }
-      }
+      { ...history.location },
+      { ...history.location.state, __componentState: this.currentComponentState(), isInitial: true }
     )
-    this.listener = history.listen((location, action) => {
+    this.listener = history.listen(({ location, action }) => {
       const historyState = location.state && location.state.__componentState
       // react to external events
       if (action === 'PUSH' && !historyState) {
@@ -202,9 +200,9 @@ export default class QueryContainer extends PureComponent<QueryContainerProps, S
   }
 
   calculateQueryString() {
-    return Object.keys(this.components).map(key => {
+    return `?${Object.keys(this.components).map(key => {
       return queryString.stringify(this.components[key].serialized)
-    }).filter(s => s && s.length > 0).join('&')
+    }).filter(s => s && s.length > 0).join('&')}`
   }
 
   initQueryManager(): QueryManager {

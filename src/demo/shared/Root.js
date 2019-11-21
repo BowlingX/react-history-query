@@ -5,11 +5,11 @@
 import * as React from 'react'
 import { createStore, combineReducers, compose } from 'redux'
 import { reducer as formReducer } from 'redux-form'
-import createHistory from 'history/createBrowserHistory'
+import { createBrowserHistory } from 'history'
 import { Provider } from 'react-redux'
 import QueryContainer from '../../lib/components/QueryContainer'
 
-export const history = createHistory()
+export const history = createBrowserHistory()
 
 const store = createStore(
   combineReducers({

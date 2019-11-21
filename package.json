@@ -39,7 +39,7 @@
   },
   "homepage": "https://github.com/BowlingX/react-history-query#readme",
   "peerDependencies": {
-    "history": "^4|^5",
+    "history": "^5",
     "react": "^16.8"
   },
   "dependencies": {
@@ -74,7 +74,7 @@
     "flow-bin": "^0.108.0",
     "flow-copy-source": "^2.0.2",
     "flow-status-webpack-plugin": "^0.1.7",
-    "history": "^4.7.2",
+    "history": "^5.0.0-beta.0",
     "jasmine-core": "^2.6.4",
     "karma": "^1.7.0",
     "karma-chrome-launcher": "^2.2.0",
