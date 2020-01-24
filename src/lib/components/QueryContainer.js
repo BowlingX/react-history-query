@@ -86,7 +86,7 @@ export default class QueryContainer extends PureComponent<QueryContainerProps, S
   /*
    * Handles external push events
    */
-  handlePush(previousState: Object) {
+  handleQueryChange() {
     this.isTransitioning = true
     const parsedQuery = this.initialParsedQuery(this.props.history.location)
     // we skip one cycle to support proper handling of route switches / prop updates in fromHistory
@@ -112,45 +112,10 @@ export default class QueryContainer extends PureComponent<QueryContainerProps, S
         }, {})
         this.components[cmp] = { ...this.components[cmp], state: nextState, serialized }
       })
-      this.props.history.replace({
-        ...this.props.history.location
-      }, { ...previousState, __componentState: this.currentComponentState() })
+
       this.refreshState()
       this.isTransitioning = false
     })
-  }
-
-  handlePop(previousState: Object) {
-    this.isTransitioning = true
-    Object.keys(previousState).forEach(key => {
-      if (this.components[key]) {
-        Object.keys(previousState[key]).forEach(propKey => {
-          const oldValue = previousState[key][propKey]
-          if (oldValue === undefined || (!shallowEqual(oldValue, this.components[key].state[propKey]))) {
-            this.components[key].options[propKey].fromHistory(
-              oldValue, this.components[key].props)
-            // mutate current state with old value,
-            // this way we can only call fromHistory where required
-            this.components[key].state[propKey] = oldValue
-            // mutate current serialized value
-            const nextPropValue = this.components[key].optionsSelector(
-              { key: propKey, value: oldValue, props: this.components[key].props }, propKey)
-            const nsKey = QueryContainer.formatNamespace(key, propKey)
-            if (!nextPropValue[nsKey]) { // if value was empty we remove the current value
-              delete this.components[key].serialized[nsKey]
-            } else {
-              this.components[key].serialized = {
-                ...this.components[key].serialized,
-                ...nextPropValue
-              }
-            }
-          }
-        })
-      }
-    })
-    // recalculate serialized state
-    this.refreshState()
-    this.isTransitioning = false
   }
 
   refreshState() {
@@ -164,39 +129,24 @@ export default class QueryContainer extends PureComponent<QueryContainerProps, S
 
   componentDidMount() {
     const { history } = this.props
-    // save initial state
-    history.replace(
-      { ...history.location },
-      { ...history.location.state, __componentState: this.currentComponentState(), isInitial: true }
-    )
     this.listener = history.listen(({ location, action }) => {
       const historyState = location.state && location.state.__componentState
-      // react to external events
+      // do not react to our own events:
+      if (
+        (action === 'REPLACE' || action === 'PUSH') &&
+        historyState
+      ) {
+        return
+      }
       if (action === 'PUSH' && !historyState) {
-        this.handlePush(location.state)
+        this.handleQueryChange()
         return
       }
-      const previousState = historyState ?
-        location.state.__componentState : this.blankComponentState()
-      if (action !== 'POP' || !previousState) {
+      if (action !== 'POP') {
         return
       }
-      this.handlePop(previousState)
+      this.handleQueryChange()
     })
-  }
-
-  currentComponentState() {
-    return Object.keys(this.components).reduce((initial, key) => ({
-      ...initial,
-      [key]: this.components[key].state
-    }), {})
-  }
-
-  blankComponentState() {
-    return Object.keys(this.components).reduce((initial, key) => ({
-      ...initial,
-      [key]: this.components[key].blankState
-    }), {})
   }
 
   calculateQueryString() {
@@ -228,10 +178,12 @@ export default class QueryContainer extends PureComponent<QueryContainerProps, S
           serialized: {}
         })
         this.components[namespace] = { ...this.components[namespace], ...next }
+
         this.props.history.push(
           { pathname: location.pathname, search: this.calculateQueryString() },
-          { __componentState: this.currentComponentState() }
+          { __componentState: true }
         )
+
         this.updateState(namespace, next.serialized)
       },
       updateProps: (namespace: string = DEFAULT_NAMESPACE, props: Object) => {
@@ -271,21 +223,12 @@ export default class QueryContainer extends PureComponent<QueryContainerProps, S
           this.namespaceGc[namespace] = 1
         }
 
-        // In case the component get's registered during navigation, we don't replace the current history entry
-        // otherwise we would overwrite it with the old state.
-        if (this.props.history.action !== 'POP') {
-          this.props.history.replace({
-            ...this.props.history.location,
-            state: { ...this.props.history.location.state, __componentState: this.currentComponentState() }
-          })
-        }
-
         this.updateState(namespace, serialized)
 
         return { state, serialized }
       },
       /* will replace the blank state with the current state */
-      persistCurrentState: (namespace?: string = DEFAULT_NAMESPACE): boolean => {
+      persistCurrentState: (namespace: string = DEFAULT_NAMESPACE): boolean => {
         if (!this.components[namespace]) {
           return false
         }
@@ -296,7 +239,7 @@ export default class QueryContainer extends PureComponent<QueryContainerProps, S
       createQueryString: (...namespaces: Array<string>) => {
         return createQueryString(this.state.persistedComponents, ...namespaces)
       },
-      unregister: (namespace?: string = DEFAULT_NAMESPACE) => {
+      unregister: (namespace: string = DEFAULT_NAMESPACE) => {
         this.namespaceGc[namespace] -= 1
         if (this.namespaceGc[namespace] === 0) {
           if (this.components[namespace] !== undefined) {
