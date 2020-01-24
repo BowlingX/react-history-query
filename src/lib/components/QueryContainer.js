@@ -129,7 +129,7 @@ export default class QueryContainer extends PureComponent<QueryContainerProps, S
 
   componentDidMount() {
     const { history } = this.props
-    this.listener = history.listen(({ location, action }) => {
+    this.listener = history.listen((location, action) => {
       const historyState = location.state && location.state.__componentState
       // do not react to our own events:
       if (
@@ -150,9 +150,9 @@ export default class QueryContainer extends PureComponent<QueryContainerProps, S
   }
 
   calculateQueryString() {
-    return `?${Object.keys(this.components).map(key => {
+    return Object.keys(this.components).map(key => {
       return queryString.stringify(this.components[key].serialized)
-    }).filter(s => s && s.length > 0).join('&')}`
+    }).filter(s => s && s.length > 0).join('&')
   }
 
   initQueryManager(): QueryManager {
