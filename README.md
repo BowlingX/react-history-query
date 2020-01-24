@@ -6,6 +6,8 @@ react-history-query
 
 A simple HOC to connect component props to query parameters.
 
+**DEPRECATED**: This package is no longer maintained. Use my state-query handler instead: https://github.com/BowlingX/geschichte
+
 ## Why?
 
 It is often crucial to support restoring and syncing the state of an application trough query parameters.
